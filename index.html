@@ -1,0 +1,873 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
+  padding: 20px;
+  background: #eaf3ff;
+  text-align: center;
+}
+h1{ color:#1e40af }
+button{
+  background:#2563eb; color:white; border:0; padding:10px 18px; border-radius:10px;
+}
+button:hover{ filter:brightness(.95) }</style></head>
+<body>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>세상의 모든 소리</title>
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tone.js & Lucide Icons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body { font-family: 'Pretendard GOV', sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    .font-black-han { font-family: 'Black Han Sans', sans-serif; }
+    
+    /* Custom Scrollbar */
+    .sleek-scrollbar::-webkit-scrollbar { height: 12px; }
+    .sleek-scrollbar::-webkit-scrollbar-track { background: #f0f9ff; border-radius: 10px; border: 2px solid #ffffff; }
+    .sleek-scrollbar::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; border: 3px solid #f0f9ff; }
+    .sleek-scrollbar::-webkit-scrollbar-thumb:hover { background: #7dd3fc; }
+    
+    /* Touch Action for Canvas */
+    .touch-drawing { touch-action: none; }
+
+    /* Transitions */
+    .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .note-block { transition: background-color 0.2s; }
+  </style>
+</head>
+<body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-hidden">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm p-3 md:p-4 flex flex-col md:flex-row items-center justify-between z-10 gap-3 md:gap-0 shrink-0">
+    <div class="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
+      <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-md shrink-0">
+        <i data-lucide="music" class="text-white w-5 h-5 md:w-6 md:h-6"></i>
+      </div>
+      <h1 class="text-xl md:text-2xl text-slate-600/90 tracking-[0.05em] mt-1 whitespace-nowrap font-black-han" data-i18n="title">
+        세상의 모든 소리
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto flex-wrap justify-center md:justify-end" id="header-controls">
+      <button id="btn-chord-guide" class="flex items-center gap-1.5 px-3 py-2 md:px-4 md:py-2 rounded-2xl font-bold transition-all border-2 bg-white text-gray-400 border-gray-100 hover:bg-gray-50">
+        <i data-lucide="sparkles" class="w-3 h-3 md:w-4 md:h-4" id="icon-chord-guide"></i>
+        <span class="text-xs md:text-sm" data-i18n="chordGuide">화음 가이드</span>
+      </button>
+
+      <button id="btn-extended" class="flex items-center gap-1.5 px-3 py-2 md:px-4 md:py-2 rounded-2xl font-bold transition-all border-2 bg-white text-gray-400 border-gray-100 hover:bg-gray-50">
+        <i data-lucide="layers" class="w-3 h-3 md:w-4 md:h-4" id="icon-extended"></i>
+        <span class="text-xs md:text-sm" data-i18n="extendedMode">확장판</span>
+      </button>
+
+      <div class="flex items-center gap-1 md:gap-2 bg-sky-50/50 p-1 md:p-1.5 rounded-full" id="playback-controls">
+        <button id="btn-play" class="p-2.5 md:p-3 rounded-full flex items-center justify-center transition-transform active:scale-95 bg-teal-200 text-teal-700 shadow-sm hover:bg-teal-300">
+          <span id="icon-play-wrapper" class="flex items-center justify-center ml-0.5 md:ml-1"><i data-lucide="play" class="w-4 h-4 md:w-5 md:h-5 fill-current"></i></span>
+        </button>
+        <button id="btn-stop" class="p-2.5 md:p-3 rounded-full bg-rose-200 text-rose-700 shadow-sm hover:bg-rose-300 transition-transform active:scale-95">
+          <i data-lucide="square" class="w-3 h-3 md:w-4 md:h-4 fill-current"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 md:gap-3 bg-white border-2 border-sky-100 px-3 py-1.5 md:px-4 md:py-2 rounded-2xl shadow-sm hidden sm:flex">
+        <i data-lucide="settings-2" class="text-gray-400 w-4 h-4 md:w-5 md:h-5"></i>
+        <div class="flex flex-col">
+          <div class="flex justify-between text-[9px] md:text-[10px] font-bold text-gray-400 mb-0.5 md:mb-1 w-full">
+            <span data-i18n="slow">느리게</span><span class="text-sky-600 px-1" id="bpm-display">120 BPM</span><span data-i18n="fast">빠르게</span>
+          </div>
+          <input type="range" id="bpm-slider" min="60" max="200" value="120" class="w-20 md:w-24 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-sky-500">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Canvas -->
+  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-6 overflow-hidden relative">
+    <div class="flex-1 bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto overflow-y-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
+      
+      <!-- Sidebar (Pitches) -->
+      <div id="sidebar-pitches" class="sticky left-0 z-20 w-10 md:w-16 bg-white border-r-2 border-gray-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] flex flex-col shrink-0">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="flex flex-row relative min-w-max">
+        <!-- Grid Area -->
+        <div id="grid-area" class="relative cursor-crosshair touch-drawing shrink-0 bg-white">
+          
+          <!-- Background Rows -->
+          <div id="grid-rows" class="absolute inset-0 flex flex-col pointer-events-none z-0"></div>
+          
+          <!-- Background Cols -->
+          <div id="grid-cols" class="absolute inset-0 flex pointer-events-none z-0"></div>
+          
+          <!-- Playhead -->
+          <div id="playhead" class="absolute top-0 bottom-0 w-1 bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)] z-20 transition-all duration-75" style="left: 0%;"></div>
+          
+          <!-- Notes Container -->
+          <div id="notes-container" class="absolute inset-0 pointer-events-none z-10"></div>
+        </div>
+
+        <!-- Add Measure Button -->
+        <div id="btn-add-measure" class="w-12 md:w-16 flex flex-col border-l-2 border-gray-100 bg-gray-50/50 hover:bg-sky-50 transition-colors cursor-pointer group shrink-0">
+          <div class="flex-1 flex flex-col items-center justify-center text-gray-400 group-hover:text-sky-500 pointer-events-none">
+            <i data-lucide="plus" class="w-6 h-6 md:w-8 md:h-8 mb-1 md:mb-2 group-hover:scale-110 transition-transform"></i>
+            <span class="text-[10px] md:text-xs font-bold text-center leading-tight">+ <span data-i18n="addMeasure">마디 추가</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Tools -->
+  <footer class="bg-white pt-3 pb-2 md:pt-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0" id="footer-controls">
+    <div class="max-w-7xl mx-auto px-2 md:px-4 flex flex-col gap-3">
+      
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
+          <div class="relative flex-1 lg:flex-none">
+            <select id="instrument-select" class="w-full appearance-none bg-gray-50 border-2 border-gray-200 text-gray-700 py-2.5 md:py-3 pl-3 pr-8 md:pr-10 rounded-xl md:rounded-2xl text-sm md:text-base font-bold focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent cursor-pointer transition-all hover:bg-gray-100">
+              <!-- Options rendered by JS -->
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 md:px-3 text-gray-500">
+              <i data-lucide="chevron-down" class="w-4 h-4 md:w-5 md:h-5"></i>
+            </div>
+          </div>
+
+          <button id="btn-record" class="hidden flex items-center justify-center gap-1.5 md:gap-2 px-3 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-bold transition-all shadow-sm border whitespace-nowrap text-sm md:text-base bg-red-50 text-red-600 border-red-100 hover:bg-red-100">
+            <span class="text-base md:text-lg">🔴</span>
+            <span id="record-text" data-i18n="recordNew">새 소리 녹음</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap justify-center items-center gap-2 w-full lg:w-auto">
+          <button id="btn-clear" class="flex items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-3 bg-red-50 text-red-500 font-bold rounded-xl md:rounded-2xl hover:bg-red-100 transition-colors">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5 md:w-4 md:h-4"></i><span class="text-xs md:text-sm hidden sm:inline" data-i18n="clearAll">초기화</span>
+          </button>
+          <button id="btn-download" class="flex items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-3 font-bold rounded-xl md:rounded-2xl transition-colors text-xs md:text-sm bg-indigo-50 text-indigo-600 hover:bg-indigo-100">
+            <i data-lucide="download" id="icon-download" class="w-3.5 h-3.5 md:w-4 md:h-4"></i><span id="text-download" data-i18n="download">음원 저장</span>
+          </button>
+          <button id="btn-share" class="flex items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-3 bg-pink-50 text-pink-600 font-bold rounded-xl md:rounded-2xl transition-colors text-xs md:text-sm hover:bg-pink-100">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 md:w-4 md:h-4"></i><span class="hidden sm:inline" data-i18n="share">링크 공유</span>
+          </button>
+
+          <div class="w-px h-5 bg-gray-200 hidden md:block mx-1"></div>
+
+          <button id="btn-help" class="flex items-center justify-center p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors" title="사용법 보기">
+            <i data-lucide="help-circle" class="w-4 h-4 md:w-5 md:h-5"></i>
+          </button>
+          <button id="btn-lang" class="flex items-center gap-1 md:gap-1.5 p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors">
+            <i data-lucide="globe" class="w-4 h-4"></i><span class="text-xs md:text-sm hidden md:inline" data-i18n="langToggle">English</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="text-center mt-1 md:mt-2">
+        <a href="https://litt.ly/chichiboo" target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-xs font-bold text-gray-400 hover:text-sky-500 transition-colors" data-i18n="createdBy">Created by. 교육뮤지컬 꿈꾸는 치수쌤</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg text-sm md:text-base font-bold transition-all duration-300 transform scale-0 opacity-0 z-50 whitespace-nowrap pointer-events-none">
+    메시지
+  </div>
+  
+  <!-- Help Modal -->
+  <div id="modal-help" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-lg w-full p-5 md:p-6 relative transform scale-95 transition-transform duration-300" id="modal-help-content">
+      <button id="btn-close-help" class="absolute top-3 right-3 md:top-4 md:right-4 p-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"><i data-lucide="x" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+      <h2 class="text-xl md:text-2xl mb-4 md:mb-5 text-gray-800 mt-2 font-bold" data-i18n="helpTitle">✨ 이렇게 사용해요! ✨</h2>
+      <div class="space-y-4 md:space-y-5 text-sm md:text-base text-gray-700 leading-relaxed font-medium">
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">👆</span> <span data-i18n="help1">소리 찍기...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">↔️</span> <span data-i18n="help2">길게 늘리기...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎹</span> <span data-i18n="help3">악기 바꾸기...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎙️</span> <span data-i18n="help4">내 소리 녹음...</span></p>
+      </div>
+      <div class="mt-6 md:mt-8 text-center">
+        <button id="btn-ok-help" class="bg-sky-500 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-sky-400 transition-colors shadow-md w-full sm:w-auto" data-i18n="helpBtn">네, 알겠어요!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Clear Modal -->
+  <div id="modal-confirm" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl p-6 relative flex flex-col items-center min-w-[300px] transform scale-95 transition-transform duration-300" id="modal-confirm-content">
+      <h3 class="text-lg md:text-xl font-bold mb-6 text-gray-800" id="confirm-msg">모든 음표를 지우시겠습니까?</h3>
+      <div class="flex gap-4 w-full justify-center">
+        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto" id="btn-cancel-text">취소</button>
+        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto" id="btn-confirm-text">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Translations ---
+    const translations = {
+      ko: {
+        title: '세상의 모든 소리', slow: '느리게', fast: '빠르게', download: '음원 저장', downloading: '저장 중...', share: '링크 공유', clearAll: '초기화',
+        chordGuide: '화음 가이드', extendedMode: '확장판', addMeasure: '마디 추가', helpTitle: '✨ 이렇게 사용해요! ✨',
+        help1: '소리 찍기: 빈 칸을 터치(클릭)하거나 쭉 드래그해서 연속으로 소리를 그려보세요.',
+        help2: '길게 늘리기: 블록 오른쪽 끝의 흰색 부분을 잡고 옆으로 당기면 소리가 길어져요.',
+        help3: '악기 바꾸기: 화면 아래쪽의 메뉴를 눌러 다양한 악기 소리를 골라보세요.',
+        help4: "내 소리 녹음: 악기를 '내 소리'로 바꾸고 🔴 버튼을 눌러보세요. 강아지 소리, 목소리 등을 녹음하면 나만의 악기가 됩니다!",
+        helpBtn: '네, 알겠어요!', recordNew: '새 소리 녹음', recordStop: '정지 (녹음 중...)', recordRetry: '다시 녹음 (최대 3초)',
+        toastNoNote: '음표를 먼저 찍어주세요! 🎵', toastMixing: '음원 믹싱 중... (약 10초 정도 소요됩니다) 🎧', toastDone: '다운로드 완료! 🎉', toastFail: '다운로드 실패: ',
+        toastShareMic: "링크 복사 완료! ('내 소리'는 피아노로 변경되어 공유됩니다) 🔗", toastShare: '링크가 복사되었습니다! 친구에게 공유해보세요 🔗',
+        toastShareFail: '링크 복사에 실패했습니다.', toastRecDone: '🎤 녹음 완료! 블록 길이를 늘리면 소리가 반복됩니다.', toastMicErr: '마이크 접근 권한이 필요합니다! 🎙️',
+        langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도'],
+        chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
+        instNames: { piano: '그랜드 피아노', marimba: '마림바', strings: '클래식 현악기', pluck: '어쿠스틱 기타', synth: '레트로 신디사이저', drum: '전자 드럼', mic: '내 소리' },
+        createdBy: 'Created by. 교육뮤지컬 꿈꾸는 치수쌤', confirmClear: '모든 음표를 지우시겠습니까?', cancel: '취소', confirm: '확인'
+      },
+      en: {
+        title: 'Sounds of the World', slow: 'Slow', fast: 'Fast', download: 'Save Audio', downloading: 'Saving...', share: 'Share Link', clearAll: 'Clear All',
+        chordGuide: 'Chord Guide', extendedMode: 'Extended', addMeasure: 'Add Measure', helpTitle: '✨ How to play ✨',
+        help1: 'Add Notes: Tap or drag across empty spaces to draw sound blocks.',
+        help2: 'Extend Length: Drag the white handle on the right of a block to make it longer.',
+        help3: 'Change Instruments: Use the menu at the bottom to choose different sounds.',
+        help4: "Record Sound: Change instrument to 'My Sound' and press 🔴. Record anything to make your own instrument!",
+        helpBtn: 'Got it!', recordNew: 'Record Sound', recordStop: 'Stop (Recording...)', recordRetry: 'Record Again (Max 3s)',
+        toastNoNote: 'Please add some notes first! 🎵', toastMixing: 'Mixing audio... (Takes about 10 seconds) 🎧', toastDone: 'Download complete! 🎉', toastFail: 'Download failed: ',
+        toastShareMic: "Link copied! ('My Sound' will be shared as a piano) 🔗", toastShare: 'Link copied! Share it with your friends 🔗',
+        toastShareFail: 'Failed to copy link.', toastRecDone: '🎤 Recording complete! Extend blocks to loop the sound.', toastMicErr: 'Microphone access is required! 🎙️',
+        langToggle: '한국어', pitchLabels: ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+        chromaticLabels: ['C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
+        instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
+        createdBy: 'Created by. Chisoo', confirmClear: 'Clear all notes?', cancel: 'Cancel', confirm: 'Confirm'
+      }
+    };
+
+    const INSTRUMENTS_BASE = [
+      { id: 'piano', icon: '🎹' }, { id: 'marimba', icon: '🪵' }, { id: 'strings', icon: '🎻' },
+      { id: 'pluck', icon: '🎸' }, { id: 'synth', icon: '🚀' }, { id: 'drum', icon: '🥁' }, { id: 'mic', icon: '🎤' }
+    ];
+
+    // --- State ---
+    let state = {
+      lang: 'ko',
+      isExtended: false,
+      notes: [], // { id, pitchId, step, duration }
+      totalSteps: 32,
+      isPlaying: false,
+      currentStep: 0,
+      bpm: 120,
+      instrument: 'piano',
+      showChordGuide: false,
+      hoveredMidi: null,
+      isRecording: false,
+      recordedUrl: null,
+      isExporting: false,
+      isToneStarted: false,
+      isDrawing: false,
+      resizing: null // { id, startX, originalDuration, colWidth }
+    };
+
+    let synth = null;
+    let sampler = null;
+    let playInterval = null;
+    let mediaRecorder = null;
+    let lastDrawnNote = { step: -1, pitchId: null };
+    let toastTimeout = null;
+    let PITCHES = [];
+
+    // --- Audio Setup ---
+    const createSynth = (inst) => {
+      const vol = new Tone.Volume(-8).toDestination();
+      switch (inst) {
+        case 'marimba': return new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3.01, modulationIndex: 10, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 } }).connect(vol);
+        case 'strings': return new Tone.PolySynth(Tone.AMSynth, { harmonicity: 1, oscillator: { type: 'sawtooth' }, envelope: { attack: 0.1, decay: 0.1, sustain: 1, release: 1.2 } }).connect(vol);
+        case 'pluck': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }).connect(vol);
+        case 'synth': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fatsawtooth', count: 3, spread: 30 }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.5 } }).connect(vol);
+        case 'drum': return new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.05, octaves: 4, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4, attackCurve: 'exponential' } }).connect(vol);
+        case 'piano': default: return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'amsine' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 1.2 } }).connect(vol);
+      }
+    };
+
+    const updatePitches = () => {
+      const tLang = translations[state.lang];
+      if (state.isExtended) {
+        PITCHES = [
+          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.chromaticLabels[0] },
+          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.chromaticLabels[1] },
+          { id: 'A#4', midi: 70, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[2] },
+          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.chromaticLabels[3] },
+          { id: 'G#4', midi: 68, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[4] },
+          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.chromaticLabels[5] },
+          { id: 'F#4', midi: 66, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[6] },
+          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.chromaticLabels[7] },
+          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.chromaticLabels[8] },
+          { id: 'D#4', midi: 63, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[9] },
+          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.chromaticLabels[10] },
+          { id: 'C#4', midi: 61, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[11] },
+          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.chromaticLabels[12] },
+        ];
+      } else {
+        PITCHES = [
+          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.pitchLabels[0] },
+          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.pitchLabels[1] },
+          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.pitchLabels[2] },
+          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.pitchLabels[3] },
+          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.pitchLabels[4] },
+          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.pitchLabels[5] },
+          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.pitchLabels[6] },
+          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.pitchLabels[7] },
+        ];
+      }
+    };
+
+    // --- DOM Elements ---
+    const els = {
+      sidebar: document.getElementById('sidebar-pitches'),
+      gridArea: document.getElementById('grid-area'),
+      gridRows: document.getElementById('grid-rows'),
+      gridCols: document.getElementById('grid-cols'),
+      notesContainer: document.getElementById('notes-container'),
+      playhead: document.getElementById('playhead'),
+      instrumentSelect: document.getElementById('instrument-select'),
+      btnRecord: document.getElementById('btn-record'),
+      recordText: document.getElementById('record-text'),
+      toast: document.getElementById('toast'),
+      bpmSlider: document.getElementById('bpm-slider'),
+      bpmDisplay: document.getElementById('bpm-display'),
+      btnPlay: document.getElementById('btn-play'),
+      btnStop: document.getElementById('btn-stop'),
+      playIconWrapper: document.getElementById('icon-play-wrapper'),
+      btnChordGuide: document.getElementById('btn-chord-guide'),
+      btnExtended: document.getElementById('btn-extended'),
+      btnAddMeasure: document.getElementById('btn-add-measure'),
+      btnClear: document.getElementById('btn-clear'),
+      btnDownload: document.getElementById('btn-download'),
+      btnShare: document.getElementById('btn-share'),
+      btnLang: document.getElementById('btn-lang'),
+      btnHelp: document.getElementById('btn-help'),
+      modalHelp: document.getElementById('modal-help'),
+      modalConfirm: document.getElementById('modal-confirm'),
+      confirmMsg: document.getElementById('confirm-msg'),
+      btnCancelClear: document.getElementById('btn-cancel-clear'),
+      btnOkClear: document.getElementById('btn-ok-clear'),
+      btnOkHelp: document.getElementById('btn-ok-help'),
+      btnCloseHelp: document.getElementById('btn-close-help')
+    };
+
+    // --- Core Functions ---
+    const showToast = (msg) => {
+      els.toast.textContent = msg;
+      els.toast.classList.remove('scale-0', 'opacity-0');
+      els.toast.classList.add('scale-100', 'opacity-100');
+      if(toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        els.toast.classList.remove('scale-100', 'opacity-100');
+        els.toast.classList.add('scale-0', 'opacity-0');
+      }, 3000);
+    };
+
+    const updatePlayhead = () => {
+      els.playhead.style.left = `${(state.currentStep / state.totalSteps) * 100}%`;
+    };
+
+    const applyTranslations = () => {
+      const tLang = translations[state.lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (tLang[key]) el.textContent = tLang[key];
+      });
+      
+      els.instrumentSelect.innerHTML = INSTRUMENTS_BASE.map(inst => 
+        `<option value="${inst.id}" ${state.instrument === inst.id ? 'selected' : ''}>${inst.icon} ${tLang.instNames[inst.id]}</option>`
+      ).join('');
+
+      els.confirmMsg.textContent = tLang.confirmClear;
+      els.btnCancelClear.textContent = tLang.cancel;
+      els.btnOkClear.textContent = tLang.confirm;
+      
+      if(state.isRecording) els.recordText.textContent = tLang.recordStop;
+      else if(state.recordedUrl) els.recordText.textContent = tLang.recordRetry;
+      else els.recordText.textContent = tLang.recordNew;
+
+      updatePitches();
+      renderGrid();
+      renderNotes();
+    };
+
+    const renderGrid = () => {
+      const isExt = state.isExtended;
+      els.sidebar.innerHTML = '';
+      els.gridRows.innerHTML = '';
+      els.gridCols.innerHTML = '';
+
+      // 완벽한 정사각형 블록을 위해 캔버스 영역 및 행 높이를 명시적 픽셀로 고정
+      const cellSize = window.innerWidth < 768 ? 40 : 48; // 모바일 40px, PC 48px
+      els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
+      els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
+      
+      // Sidebar & Rows
+      PITCHES.forEach((pitch, i) => {
+        const isHoverRoot = state.showChordGuide && state.hoveredMidi === pitch.midi;
+        const isHoverChord = state.showChordGuide && state.hoveredMidi !== null && state.hoveredMidi !== pitch.midi && 
+          (Math.abs(pitch.midi - state.hoveredMidi) === 3 || Math.abs(pitch.midi - state.hoveredMidi) === 4 || Math.abs(pitch.midi - state.hoveredMidi) === 7);
+        
+        let labelClass = pitch.id.includes('#') ? 'text-slate-400 bg-slate-50' : 'text-gray-500';
+        if (isHoverRoot) labelClass = 'bg-yellow-200 text-yellow-800 scale-110 shadow-sm z-10';
+        else if (isHoverChord) labelClass = 'bg-yellow-50 text-yellow-600 scale-105';
+
+        const sidebarDiv = document.createElement('div');
+        sidebarDiv.className = `flex flex-col items-center justify-center border-b border-gray-100 text-[10px] md:text-sm font-bold transition-all ${labelClass}`;
+        sidebarDiv.style.height = `${cellSize}px`;
+        sidebarDiv.innerHTML = `<span>${pitch.label}</span>`;
+        els.sidebar.appendChild(sidebarDiv);
+
+        let bgClass = pitch.id.includes('#') ? 'bg-slate-50/40' : '';
+        if (isHoverRoot) bgClass = 'bg-yellow-200/50';
+        else if (isHoverChord) bgClass = 'bg-yellow-100/40';
+
+        const rowDiv = document.createElement('div');
+        rowDiv.className = `flex-1 border-b border-gray-100 transition-colors ${bgClass}`;
+        els.gridRows.appendChild(rowDiv);
+      });
+
+      // Cols
+      for(let i=0; i<state.totalSteps; i++) {
+        const colDiv = document.createElement('div');
+        colDiv.className = `flex-1 border-r ${i % 8 === 7 ? 'border-gray-300 border-r-2' : i % 2 === 1 ? 'border-gray-200' : 'border-gray-100 border-dashed'}`;
+        els.gridCols.appendChild(colDiv);
+      }
+    };
+
+    const renderNotes = () => {
+      els.notesContainer.innerHTML = '';
+      state.notes.forEach(note => {
+        const pitchIndex = PITCHES.findIndex(p => p.id === note.pitchId);
+        if (pitchIndex === -1) return; 
+        
+        const pitch = PITCHES[pitchIndex];
+        const leftPercent = (note.step / state.totalSteps) * 100;
+        const topPercent = (pitchIndex / PITCHES.length) * 100;
+        const widthPercent = (note.duration / state.totalSteps) * 100;
+        const heightPercent = 100 / PITCHES.length;
+
+        const noteDiv = document.createElement('div');
+        noteDiv.className = `note-block absolute rounded-md shadow-sm border border-black/10 flex group ${pitch.color} hover:brightness-110 transition-colors duration-200 z-10 pointer-events-auto cursor-pointer`;
+        noteDiv.style.left = `${leftPercent}%`;
+        noteDiv.style.top = `${topPercent}%`;
+        noteDiv.style.width = `calc(${widthPercent}% - 2px)`;
+        noteDiv.style.height = `calc(${heightPercent}% - 2px)`;
+        noteDiv.style.marginTop = '1px';
+        noteDiv.style.marginLeft = '1px';
+
+        noteDiv.innerHTML = `
+          <div class="absolute top-1 left-1 right-1 h-1/3 bg-white/30 rounded-full pointer-events-none"></div>
+          <div class="resize-handle absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize hover:bg-black/20 rounded-r-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto">
+            <div class="w-1.5 h-1/3 bg-white/90 rounded-full pointer-events-none"></div>
+          </div>
+        `;
+
+        // Note Delete
+        noteDiv.addEventListener('pointerdown', (e) => {
+          if(e.target.closest('.resize-handle')) return;
+          e.stopPropagation();
+          if(state.isDrawing || state.resizing) return;
+          state.notes = state.notes.filter(n => n.id !== note.id);
+          renderNotes();
+        });
+
+        // Note Resize
+        const handle = noteDiv.querySelector('.resize-handle');
+        handle.addEventListener('pointerdown', (e) => {
+          e.stopPropagation(); e.preventDefault();
+          state.isDrawing = false;
+          const rect = els.gridArea.getBoundingClientRect();
+          const colWidth = rect.width / state.totalSteps;
+          state.resizing = { id: note.id, startX: e.clientX, originalDuration: note.duration, colWidth };
+        });
+
+        els.notesContainer.appendChild(noteDiv);
+      });
+    };
+
+    const updateControlsUI = () => {
+      // Buttons styling
+      if(state.showChordGuide) {
+        els.btnChordGuide.classList.replace('bg-white', 'bg-yellow-50');
+        els.btnChordGuide.classList.replace('text-gray-400', 'text-yellow-600');
+        els.btnChordGuide.classList.replace('border-gray-100', 'border-yellow-200');
+        document.getElementById('icon-chord-guide').classList.add('fill-yellow-400');
+      } else {
+        els.btnChordGuide.classList.replace('bg-yellow-50', 'bg-white');
+        els.btnChordGuide.classList.replace('text-yellow-600', 'text-gray-400');
+        els.btnChordGuide.classList.replace('border-yellow-200', 'border-gray-100');
+        document.getElementById('icon-chord-guide').classList.remove('fill-yellow-400');
+      }
+
+      if(state.isExtended) {
+        els.btnExtended.classList.replace('bg-white', 'bg-indigo-50');
+        els.btnExtended.classList.replace('text-gray-400', 'text-indigo-600');
+        els.btnExtended.classList.replace('border-gray-100', 'border-indigo-200');
+        document.getElementById('icon-extended').classList.add('text-indigo-500');
+      } else {
+        els.btnExtended.classList.replace('bg-indigo-50', 'bg-white');
+        els.btnExtended.classList.replace('text-indigo-600', 'text-gray-400');
+        els.btnExtended.classList.replace('border-indigo-200', 'border-gray-100');
+        document.getElementById('icon-extended').classList.remove('text-indigo-500');
+      }
+
+      if(state.isPlaying) {
+        els.btnPlay.className = "p-2.5 md:p-3 rounded-full flex items-center justify-center transition-transform active:scale-95 bg-yellow-200 text-yellow-700 shadow-sm";
+        els.playIconWrapper.innerHTML = `<i data-lucide="pause" class="w-4 h-4 md:w-5 md:h-5 fill-current"></i>`;
+      } else {
+        els.btnPlay.className = "p-2.5 md:p-3 rounded-full flex items-center justify-center transition-transform active:scale-95 bg-teal-200 text-teal-700 shadow-sm hover:bg-teal-300";
+        els.playIconWrapper.innerHTML = `<i data-lucide="play" class="w-4 h-4 md:w-5 md:h-5 fill-current"></i>`;
+      }
+      lucide.createIcons();
+
+      // Exporting state
+      const containers = [els.gridArea, document.getElementById('playback-controls')];
+      containers.forEach(c => {
+        if(state.isExporting) {
+          c.classList.add('pointer-events-none', 'opacity-50');
+        } else {
+          c.classList.remove('pointer-events-none', 'opacity-50');
+          c.classList.remove('opacity-80');
+        }
+      });
+      els.btnDownload.disabled = state.isExporting;
+      els.btnShare.disabled = state.isExporting;
+
+      // Mic visibility
+      if(state.instrument === 'mic') els.btnRecord.classList.remove('hidden');
+      else els.btnRecord.classList.add('hidden');
+    };
+
+    // --- Audio Logic ---
+    const playStep = (step) => {
+      const notesToPlay = state.notes.filter(n => n.step === step);
+      if (notesToPlay.length > 0) {
+        const msPerBeat = 60000 / state.bpm; 
+        const msPerStep = msPerBeat / 2;
+        const now = Tone.now() + 0.05; 
+        notesToPlay.forEach(note => {
+          const pitchId = note.pitchId;
+          const dur = (note.duration * msPerStep) / 1000; 
+          if (state.instrument === 'mic' && sampler && sampler.loaded) {
+            sampler.triggerAttackRelease(pitchId, dur, now);
+          } else if (synth && state.instrument !== 'mic') {
+            synth.triggerAttackRelease(pitchId, dur, now);
+          }
+        });
+      }
+    };
+
+    const togglePlayback = async () => {
+      if (!state.isToneStarted) { await Tone.start(); state.isToneStarted = true; }
+      state.isPlaying = !state.isPlaying;
+      updateControlsUI();
+
+      if (state.isPlaying) {
+        const msPerBeat = 60000 / state.bpm; 
+        const msPerStep = msPerBeat / 2;
+        playStep(state.currentStep);
+        playInterval = setInterval(() => {
+          state.currentStep = (state.currentStep + 1) % state.totalSteps;
+          updatePlayhead();
+          playStep(state.currentStep);
+        }, msPerStep);
+      } else {
+        clearInterval(playInterval);
+      }
+    };
+
+    const stopPlayback = () => {
+      state.isPlaying = false;
+      state.currentStep = 0;
+      clearInterval(playInterval);
+      updatePlayhead();
+      updateControlsUI();
+    };
+
+    const triggerNotePreview = (pitchId) => {
+      const msPerStep = (60000 / state.bpm) / 2;
+      const dur = msPerStep / 1000;
+      if (state.instrument === 'mic' && sampler && sampler.loaded) sampler.triggerAttackRelease(pitchId, dur);
+      else if (synth && state.instrument !== 'mic') synth.triggerAttackRelease(pitchId, dur);
+    };
+
+    const loadSampler = () => {
+      if(!state.recordedUrl) return;
+      if(sampler && sampler.dispose) sampler.dispose();
+      const buffer = new Tone.ToneAudioBuffer(state.recordedUrl, () => {
+        if(sampler) sampler.loaded = true;
+      });
+      sampler = {
+        buffer, loaded: false,
+        triggerAttackRelease: (pitchId, duration, time = Tone.now()) => {
+          if (!buffer.loaded) return;
+          const player = new Tone.Player(buffer).toDestination();
+          player.loop = true; player.fadeOut = 0.1; 
+          const interval = Tone.Frequency(pitchId).toMidi() - Tone.Frequency("C4").toMidi();
+          player.playbackRate = Math.pow(2, interval / 12);
+          player.start(time); player.stop(time + duration);
+          const delayMs = Math.max(0, (time + duration - Tone.now() + 0.2) * 1000);
+          setTimeout(() => { try { player.dispose(); } catch(e){} }, delayMs);
+        },
+        dispose: () => buffer.dispose()
+      };
+    };
+
+    // --- Pointer Events (Drawing) ---
+    const processPointerEvent = (e) => {
+      const rect = els.gridArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const colWidth = rect.width / state.totalSteps;
+      const rowHeight = rect.height / PITCHES.length;
+      const step = Math.floor(x / colWidth);
+      const pitchIndex = Math.floor(y / rowHeight);
+
+      if (step < 0 || step >= state.totalSteps || pitchIndex < 0 || pitchIndex >= PITCHES.length) return;
+
+      const pitchId = PITCHES[pitchIndex].id;
+      if (lastDrawnNote.step === step && lastDrawnNote.pitchId === pitchId) return;
+      lastDrawnNote = { step, pitchId };
+
+      const existingNoteIndex = state.notes.findIndex(n => n.step === step && n.pitchId === pitchId);
+      if (existingNoteIndex === -1) {
+        state.notes.push({ id: Date.now().toString() + Math.random(), pitchId, step, duration: 1 });
+        renderNotes();
+        triggerNotePreview(pitchId);
+      }
+    };
+
+    els.gridArea.addEventListener('pointerdown', async (e) => {
+      if (!state.isToneStarted) { await Tone.start(); state.isToneStarted = true; }
+      if (e.target.closest('.note-block') || state.resizing) return;
+      state.isDrawing = true;
+      els.gridArea.releasePointerCapture(e.pointerId);
+      processPointerEvent(e);
+    });
+
+    els.gridArea.addEventListener('pointermove', (e) => {
+      const rect = els.gridArea.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const rowHeight = rect.height / PITCHES.length;
+      const pitchIndex = Math.floor(y / rowHeight);
+      
+      if (pitchIndex >= 0 && pitchIndex < PITCHES.length) {
+        const newMidi = PITCHES[pitchIndex].midi;
+        if (state.hoveredMidi !== newMidi) { state.hoveredMidi = newMidi; renderGrid(); }
+      } else if (state.hoveredMidi !== null) {
+        state.hoveredMidi = null; renderGrid();
+      }
+
+      if (state.isDrawing && e.pointerType === 'mouse' && e.buttons === 0) {
+        state.isDrawing = false;
+        return;
+      }
+
+      if (!state.isDrawing || state.resizing) return;
+      processPointerEvent(e);
+    });
+
+    els.gridArea.addEventListener('pointerleave', () => {
+      if (!state.isDrawing) { state.hoveredMidi = null; renderGrid(); }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!state.resizing) return;
+      const dx = e.clientX - state.resizing.startX;
+      const deltaSteps = Math.round(dx / state.resizing.colWidth);
+      let newDuration = Math.max(1, state.resizing.originalDuration + deltaSteps); 
+      
+      state.notes = state.notes.map(note => {
+        if (note.id === state.resizing.id) return { ...note, duration: Math.min(newDuration, state.totalSteps - note.step) };
+        return note;
+      });
+      renderNotes();
+    });
+
+    window.addEventListener('pointerup', () => {
+      state.isDrawing = false;
+      state.hoveredMidi = null;
+      if(state.resizing) { state.resizing = null; renderGrid(); }
+    });
+    window.addEventListener('pointercancel', () => {
+      state.isDrawing = false;
+      state.hoveredMidi = null;
+      if(state.resizing) { state.resizing = null; renderGrid(); }
+    });
+
+    // --- Actions ---
+    els.btnChordGuide.addEventListener('click', () => { state.showChordGuide = !state.showChordGuide; updateControlsUI(); renderGrid(); });
+    els.btnExtended.addEventListener('click', () => {
+      if(state.isExtended) state.notes = state.notes.map(n => ({ ...n, pitchId: n.pitchId.replace('#', '') }));
+      state.isExtended = !state.isExtended;
+      updatePitches(); updateControlsUI(); renderGrid(); renderNotes();
+    });
+    els.btnPlay.addEventListener('click', togglePlayback);
+    els.btnStop.addEventListener('click', stopPlayback);
+    els.bpmSlider.addEventListener('input', (e) => { state.bpm = Number(e.target.value); els.bpmDisplay.textContent = `${state.bpm} BPM`; if(state.isPlaying){ stopPlayback(); togglePlayback(); } });
+    els.instrumentSelect.addEventListener('change', (e) => {
+      state.instrument = e.target.value;
+      if(state.instrument !== 'mic') {
+        if(synth) synth.dispose();
+        synth = createSynth(state.instrument);
+      }
+      updateControlsUI();
+    });
+    els.btnAddMeasure.addEventListener('click', () => { state.totalSteps += 32; renderGrid(); renderNotes(); });
+    els.btnClear.addEventListener('click', () => {
+      els.modalConfirm.classList.remove('hidden');
+      setTimeout(()=> els.modalConfirm.classList.remove('opacity-0'), 10);
+      document.getElementById('modal-confirm-content').classList.remove('scale-95');
+    });
+    els.btnCancelClear.addEventListener('click', () => {
+      els.modalConfirm.classList.add('opacity-0');
+      document.getElementById('modal-confirm-content').classList.add('scale-95');
+      setTimeout(()=> els.modalConfirm.classList.add('hidden'), 300);
+    });
+    els.btnOkClear.addEventListener('click', () => {
+      state.notes = []; stopPlayback(); renderNotes();
+      els.btnCancelClear.click();
+    });
+    
+    els.btnHelp.addEventListener('click', () => {
+      els.modalHelp.classList.remove('hidden');
+      setTimeout(()=> els.modalHelp.classList.remove('opacity-0'), 10);
+      document.getElementById('modal-help-content').classList.remove('scale-95');
+    });
+    const closeHelp = () => {
+      els.modalHelp.classList.add('opacity-0');
+      document.getElementById('modal-help-content').classList.add('scale-95');
+      setTimeout(()=> els.modalHelp.classList.add('hidden'), 300);
+    };
+    els.btnOkHelp.addEventListener('click', closeHelp);
+    els.btnCloseHelp.addEventListener('click', closeHelp);
+
+    els.btnLang.addEventListener('click', () => {
+      state.lang = state.lang === 'ko' ? 'en' : 'ko';
+      applyTranslations();
+    });
+
+    els.btnRecord.addEventListener('click', async () => {
+      const tLang = translations[state.lang];
+      if (state.isRecording && mediaRecorder) {
+        if (mediaRecorder.state === "recording") mediaRecorder.stop();
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        const chunks = [];
+        mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'audio/webm' });
+          state.recordedUrl = URL.createObjectURL(blob);
+          loadSampler();
+          showToast(tLang.toastRecDone);
+          stream.getTracks().forEach(track => track.stop()); 
+          state.isRecording = false;
+          applyTranslations();
+        };
+        mediaRecorder.start(); state.isRecording = true; applyTranslations();
+        setTimeout(() => { if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); }, 3000);
+      } catch (err) {
+        showToast(tLang.toastMicErr); state.isRecording = false; applyTranslations();
+      }
+    });
+
+    els.btnDownload.addEventListener('click', async () => {
+      const tLang = translations[state.lang];
+      if (state.notes.length === 0) return showToast(tLang.toastNoNote);
+      if (state.isExporting) return;
+      state.isExporting = true; stopPlayback(); updateControlsUI(); showToast(tLang.toastMixing);
+
+      try {
+        await Tone.start();
+        const recorder = new Tone.Recorder(); Tone.Destination.connect(recorder); recorder.start();
+        const msPerBeat = 60000 / state.bpm; const msPerStep = msPerBeat / 2; const now = Tone.now() + 0.5;
+
+        state.notes.forEach(note => {
+          const pitchId = note.pitchId; const dur = (note.duration * msPerStep) / 1000; const time = now + (note.step * msPerStep) / 1000;
+          if (state.instrument === 'mic' && sampler && sampler.loaded) sampler.triggerAttackRelease(pitchId, dur, time);
+          else if (synth && state.instrument !== 'mic') synth.triggerAttackRelease(pitchId, dur, time);
+        });
+
+        const totalTime = (state.totalSteps * msPerStep) / 1000 + 2;
+        setTimeout(async () => {
+          try {
+            const recording = await recorder.stop(); const url = URL.createObjectURL(recording);
+            const anchor = document.createElement("a"); anchor.download = "세상의_모든_소리.webm"; anchor.href = url; anchor.click();
+            showToast(tLang.toastDone);
+          } catch(e) { showToast(tLang.toastFail + e.message); } 
+          finally { Tone.Destination.disconnect(recorder); state.isExporting = false; updateControlsUI(); }
+        }, (totalTime + 0.5) * 1000);
+      } catch (err) { showToast(tLang.toastFail); state.isExporting = false; updateControlsUI(); }
+    });
+
+    els.btnShare.addEventListener('click', () => {
+      const tLang = translations[state.lang];
+      if (state.notes.length === 0) return showToast(tLang.toastNoNote);
+      const data = { b: state.bpm, t: state.totalSteps, e: state.isExtended ? 1 : 0, i: state.instrument === 'mic' ? 'piano' : state.instrument, n: state.notes.map(n => [n.pitchId, n.step, n.duration]) };
+      try {
+        const encoded = btoa(JSON.stringify(data)); const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
+        const textArea = document.createElement("textarea"); textArea.value = shareUrl; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
+        showToast(state.instrument === 'mic' ? tLang.toastShareMic : tLang.toastShare);
+      } catch (e) { showToast(tLang.toastShareFail); }
+    });
+
+    // --- Init ---
+    const init = () => {
+      lucide.createIcons();
+      synth = createSynth(state.instrument);
+
+      // 화면 크기 변경 시 그리드 정사각형 비율 재계산 방어
+      window.addEventListener('resize', () => {
+        renderGrid();
+        renderNotes();
+      });
+
+      const params = new URLSearchParams(window.location.search);
+      const dataParam = params.get('data');
+      if (dataParam) {
+        try {
+          const decoded = JSON.parse(atob(dataParam));
+          if (decoded.b) { state.bpm = decoded.b; els.bpmSlider.value = state.bpm; els.bpmDisplay.textContent = `${state.bpm} BPM`; }
+          if (decoded.i) state.instrument = decoded.i;
+          if (decoded.t) state.totalSteps = decoded.t;
+          if (decoded.e) state.isExtended = true;
+          if (decoded.n) {
+            state.notes = decoded.n.map((n, i) => {
+              let pitchId = n[0];
+              if (typeof n[0] === 'number') pitchId = getDiatonicPitches('ko')[n[0]].id;
+              return { id: `restored-${i}-${Date.now()}`, pitchId, step: n[1], duration: n[2] };
+            });
+            if (state.notes.some(note => note.pitchId.includes('#'))) state.isExtended = true;
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch(e) { console.error('Data restore failed.', e); }
+      }
+      
+      applyTranslations();
+      updateControlsUI();
+    };
+
+    init();
+  </script>
+</body>
+</html><script>function showAlert(){
+  const box = document.createElement('div');
+  box.textContent = '버튼이 클릭되었습니다! ' + new Date().toLocaleTimeString();
+  box.style.cssText = 'margin-top:20px;padding:12px;border:1px solid #93c5fd;background:#dbeafe;border-radius:10px;color:#1e40af';
+  document.body.appendChild(box);
+}
+console.log('콘솔 테스트: 정상 동작');</script></body></html>
