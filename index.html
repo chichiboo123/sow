@@ -49,6 +49,7 @@
     /* Transitions */
     .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     .note-block { transition: background-color 0.2s; }
+    .note-block.selected { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.9), 0 6px 14px rgba(30, 41, 59, 0.2); filter: saturate(1.1); }
 
     #canvas-scroll-container,
     #footer-controls,
@@ -165,6 +166,7 @@
           
           <!-- Notes Container -->
           <div id="notes-container" class="absolute inset-0 pointer-events-none z-10"></div>
+          <div id="selection-box" class="absolute border-2 border-sky-500 bg-sky-300/20 rounded-md pointer-events-none hidden z-30"></div>
         </div>
 
         <!-- Add Measure Button -->
@@ -249,6 +251,7 @@
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎹</span> <span data-i18n="help3">악기 바꾸기...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎙️</span> <span data-i18n="help4">내 소리 녹음...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🌐</span> <span data-i18n="help5">언어 변경...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🖱️</span> <span data-i18n="help6">Shift 드래그...</span></p>
       </div>
       <div class="mt-6 md:mt-8 text-center">
         <button id="btn-ok-help" class="bg-sky-500 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-sky-400 transition-colors shadow-md w-full sm:w-auto" data-i18n="helpBtn">네, 알겠어요!</button>
@@ -278,6 +281,7 @@
         help3: '악기 바꾸기: 화면 아래쪽의 메뉴를 눌러 다양한 악기 소리를 골라보세요.',
         help4: "내 소리 녹음: 악기를 '내 소리'로 바꾸고 🔴 버튼을 눌러보세요. 강아지 소리, 목소리 등을 녹음하면 나만의 악기가 됩니다!",
         help5: '언어 변경: 하단 우측의 언어 선택 드롭다운에서 한국어/English/日本語를 바로 바꿀 수 있어요.',
+        help6: '여러 블록 선택: Shift 키를 누른 채 드래그해서 여러 블록을 고른 뒤, 핸들을 드래그하면 길이를 한 번에 늘리거나 줄일 수 있어요.',
         helpBtn: '네, 알겠어요!', recordNew: '새 소리 녹음', recordStop: '정지 (녹음 중...)', recordRetry: '다시 녹음 (최대 3초)',
         toastNoNote: '음표를 먼저 찍어주세요! 🎵', toastMixing: '음원 믹싱 중... (약 10초 정도 소요됩니다) 🎧', toastDone: '다운로드 완료! 🎉', toastFail: '다운로드 실패: ',
         toastShareMic: "링크 복사 완료! ('내 소리'는 피아노로 변경되어 공유됩니다) 🔗", toastShare: '링크가 복사되었습니다! 친구에게 공유해보세요 🔗',
@@ -295,6 +299,7 @@
         help3: 'Change Instruments: Use the menu at the bottom to choose different sounds.',
         help4: "Record Sound: Change instrument to 'My Sound' and press 🔴. Record anything to make your own instrument!",
         help5: 'Language: Use the language dropdown at the bottom right to switch 한국어 / English / 日本語 instantly.',
+        help6: 'Multi-select blocks: Hold Shift and drag to select many blocks, then drag one resize handle to resize all selected blocks together.',
         helpBtn: 'Got it!', recordNew: 'Record Sound', recordStop: 'Stop (Recording...)', recordRetry: 'Record Again (Max 3s)',
         toastNoNote: 'Please add some notes first! 🎵', toastMixing: 'Mixing audio... (Takes about 10 seconds) 🎧', toastDone: 'Download complete! 🎉', toastFail: 'Download failed: ',
         toastShareMic: "Link copied! ('My Sound' will be shared as a piano) 🔗", toastShare: 'Link copied! Share it with your friends 🔗',
@@ -312,6 +317,7 @@
         help3: '楽器を変更: 下のメニューからいろいろな楽器の音を選べます。',
         help4: "マイサウンド録音: 楽器を『マイサウンド』にして🔴を押してください。声や音を録音すると自分だけの楽器になります！",
         help5: '言語変更: 右下の言語ドロップダウンで 한국어 / English / 日本語 をすぐ切り替えられます。',
+        help6: '複数選択: Shiftキーを押しながらドラッグで複数ブロックを選び、ハンドルを動かすとまとめて長さを変更できます。',
         helpBtn: 'わかった！', recordNew: '新しい音を録音', recordStop: '停止 (録音中...)', recordRetry: 'もう一度録音 (最大3秒)',
         toastNoNote: '先に音符を置いてください！🎵', toastMixing: '音声をミックス中...（約10秒）🎧', toastDone: 'ダウンロード完了！🎉', toastFail: 'ダウンロード失敗: ',
         toastShareMic: "リンクをコピーしました！（『マイサウンド』はピアノとして共有されます）🔗", toastShare: 'リンクをコピーしました！お友だちにシェアしよう 🔗',
@@ -345,7 +351,9 @@
       isExporting: false,
       isToneStarted: false,
       isDrawing: false,
-      resizing: null // { id, startX, originalDuration, colWidth }
+      resizing: null, // { ids, startX, originalDurations, colWidth }
+      selectedNoteIds: [],
+      selectionDrag: null // { startX, startY, currentX, currentY, colWidth, rowHeight }
     };
 
     let synth = null;
@@ -413,6 +421,7 @@
       gridRows: document.getElementById('grid-rows'),
       gridCols: document.getElementById('grid-cols'),
       notesContainer: document.getElementById('notes-container'),
+      selectionBox: document.getElementById('selection-box'),
       playhead: document.getElementById('playhead'),
       instrumentSelect: document.getElementById('instrument-select'),
       btnRecord: document.getElementById('btn-record'),
@@ -454,6 +463,45 @@
 
     const updatePlayhead = () => {
       els.playhead.style.left = `${(state.currentStep / state.totalSteps) * 100}%`;
+    };
+
+    const clearSelection = () => {
+      if (state.selectedNoteIds.length === 0) return;
+      state.selectedNoteIds = [];
+      renderNotes();
+    };
+
+    const updateSelectionBoxUI = () => {
+      if (!state.selectionDrag) {
+        els.selectionBox.classList.add('hidden');
+        return;
+      }
+      const left = Math.min(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const top = Math.min(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const width = Math.abs(state.selectionDrag.currentX - state.selectionDrag.startX);
+      const height = Math.abs(state.selectionDrag.currentY - state.selectionDrag.startY);
+      Object.assign(els.selectionBox.style, { left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
+      els.selectionBox.classList.remove('hidden');
+    };
+
+    const updateSelectedNotesByDragRect = () => {
+      if (!state.selectionDrag) return;
+      const x1 = Math.min(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const x2 = Math.max(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const y1 = Math.min(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const y2 = Math.max(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const ids = state.notes.filter(note => {
+        const pitchIndex = PITCHES.findIndex(p => p.id === note.pitchId);
+        if (pitchIndex < 0) return false;
+        const noteX1 = note.step * state.selectionDrag.colWidth;
+        const noteX2 = (note.step + note.duration) * state.selectionDrag.colWidth;
+        const noteY1 = pitchIndex * state.selectionDrag.rowHeight;
+        const noteY2 = noteY1 + state.selectionDrag.rowHeight;
+        const intersects = noteX1 < x2 && noteX2 > x1 && noteY1 < y2 && noteY2 > y1;
+        return intersects;
+      }).map(n => n.id);
+      state.selectedNoteIds = ids;
+      renderNotes();
     };
 
     const applyTranslations = () => {
@@ -550,7 +598,8 @@
         const heightPercent = 100 / PITCHES.length;
 
         const noteDiv = document.createElement('div');
-        noteDiv.className = `note-block absolute rounded-md shadow-sm border border-black/10 flex group ${pitch.color} hover:brightness-110 transition-colors duration-200 z-10 pointer-events-auto cursor-pointer`;
+        const isSelected = state.selectedNoteIds.includes(note.id);
+        noteDiv.className = `note-block absolute rounded-md shadow-sm border border-black/10 flex group ${pitch.color} hover:brightness-110 transition-colors duration-200 z-10 pointer-events-auto cursor-pointer ${isSelected ? 'selected' : ''}`;
         noteDiv.style.left = `${leftPercent}%`;
         noteDiv.style.top = `${topPercent}%`;
         noteDiv.style.width = `calc(${widthPercent}% - 2px)`;
@@ -569,8 +618,14 @@
         noteDiv.addEventListener('pointerdown', (e) => {
           if(e.target.closest('.resize-handle')) return;
           e.stopPropagation();
+          if (e.shiftKey) {
+            if (state.selectedNoteIds.includes(note.id)) state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== note.id);
+            else state.selectedNoteIds = [...state.selectedNoteIds, note.id];
+            renderNotes();
+            return;
+          }
           if(state.isDrawing || state.resizing) return;
-          state.notes = state.notes.filter(n => n.id !== note.id);
+          state.selectedNoteIds = [note.id];
           renderNotes();
         });
 
@@ -581,7 +636,10 @@
           state.isDrawing = false;
           const rect = els.gridArea.getBoundingClientRect();
           const colWidth = rect.width / state.totalSteps;
-          state.resizing = { id: note.id, startX: e.clientX, originalDuration: note.duration, colWidth };
+          const idsToResize = state.selectedNoteIds.includes(note.id) && state.selectedNoteIds.length > 1 ? [...state.selectedNoteIds] : [note.id];
+          const originalDurations = {};
+          state.notes.forEach(n => { if (idsToResize.includes(n.id)) originalDurations[n.id] = n.duration; });
+          state.resizing = { ids: idsToResize, startX: e.clientX, originalDurations, colWidth };
         });
 
         els.notesContainer.appendChild(noteDiv);
@@ -743,6 +801,16 @@
     els.gridArea.addEventListener('pointerdown', async (e) => {
       if (!state.isToneStarted) { await Tone.start(); state.isToneStarted = true; }
       if (e.target.closest('.note-block') || state.resizing) return;
+      if (e.shiftKey) {
+        const rect = els.gridArea.getBoundingClientRect();
+        const colWidth = rect.width / state.totalSteps;
+        const rowHeight = rect.height / PITCHES.length;
+        state.selectionDrag = { startX: e.clientX - rect.left, startY: e.clientY - rect.top, currentX: e.clientX - rect.left, currentY: e.clientY - rect.top, colWidth, rowHeight };
+        updateSelectionBoxUI();
+        updateSelectedNotesByDragRect();
+        return;
+      }
+      if (state.selectedNoteIds.length) clearSelection();
       state.isDrawing = true;
       els.gridArea.releasePointerCapture(e.pointerId);
       processPointerEvent(e);
@@ -766,6 +834,14 @@
         return;
       }
 
+      if (state.selectionDrag) {
+        state.selectionDrag.currentX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        state.selectionDrag.currentY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+        updateSelectionBoxUI();
+        updateSelectedNotesByDragRect();
+        return;
+      }
+
       if (!state.isDrawing || state.resizing) return;
       processPointerEvent(e);
     });
@@ -778,30 +854,59 @@
       if (!state.resizing) return;
       const dx = e.clientX - state.resizing.startX;
       const deltaSteps = Math.round(dx / state.resizing.colWidth);
-      let newDuration = Math.max(1, state.resizing.originalDuration + deltaSteps); 
-      
       state.notes = state.notes.map(note => {
-        if (note.id === state.resizing.id) return { ...note, duration: Math.min(newDuration, state.totalSteps - note.step) };
-        return note;
+        if (!state.resizing.ids.includes(note.id)) return note;
+        const originalDuration = state.resizing.originalDurations[note.id] || note.duration;
+        const newDuration = Math.max(1, originalDuration + deltaSteps);
+        return { ...note, duration: Math.min(newDuration, state.totalSteps - note.step) };
       });
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => state.notes.some(note => note.id === id));
       renderNotes();
     });
 
     window.addEventListener('pointerup', () => {
       state.isDrawing = false;
       state.hoveredMidi = null;
+      if(state.selectionDrag) {
+        state.selectionDrag = null;
+        updateSelectionBoxUI();
+      }
       if(state.resizing) { state.resizing = null; renderGrid(); }
     });
     window.addEventListener('pointercancel', () => {
       state.isDrawing = false;
       state.hoveredMidi = null;
+      if(state.selectionDrag) {
+        state.selectionDrag = null;
+        updateSelectionBoxUI();
+      }
       if(state.resizing) { state.resizing = null; renderGrid(); }
+    });
+
+    els.gridArea.addEventListener('dblclick', (e) => {
+      const noteEl = e.target.closest('.note-block');
+      if (!noteEl || state.resizing) return;
+      const rect = els.gridArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const colWidth = rect.width / state.totalSteps;
+      const rowHeight = rect.height / PITCHES.length;
+      const step = Math.floor(x / colWidth);
+      const pitchIndex = Math.floor(y / rowHeight);
+      if (pitchIndex < 0 || pitchIndex >= PITCHES.length) return;
+      const pitchId = PITCHES[pitchIndex].id;
+      const target = state.notes.find(n => n.step === step && n.pitchId === pitchId);
+      if (!target) return;
+      state.notes = state.notes.filter(n => n.id !== target.id);
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== target.id);
+      renderNotes();
     });
 
     // --- Actions ---
     els.btnChordGuide.addEventListener('click', () => { state.showChordGuide = !state.showChordGuide; updateControlsUI(); renderGrid(); });
     els.btnExtended.addEventListener('click', () => {
       if(state.isExtended) state.notes = state.notes.map(n => ({ ...n, pitchId: n.pitchId.replace('#', '') }));
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => state.notes.some(n => n.id === id));
       state.isExtended = !state.isExtended;
       updatePitches(); updateControlsUI(); renderGrid(); renderNotes();
     });
@@ -828,7 +933,7 @@
       setTimeout(()=> els.modalConfirm.classList.add('hidden'), 300);
     });
     els.btnOkClear.addEventListener('click', () => {
-      state.notes = []; stopPlayback(); renderNotes();
+      state.notes = []; state.selectedNoteIds = []; stopPlayback(); renderNotes();
       els.btnCancelClear.click();
     });
     
