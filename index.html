@@ -96,7 +96,7 @@
     }
   </style>
 </head>
-<body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-hidden">
+<body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-x-hidden">
 
   <!-- Header -->
   <header class="bg-white shadow-sm p-3 md:p-4 flex flex-col md:flex-row items-center justify-between z-10 gap-3 md:gap-0 shrink-0">
@@ -653,7 +653,7 @@
       // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
       const isMobile = window.innerWidth < 640;
       const isTablet = window.innerWidth < 1024;
-      const manyRows = PITCHES.length > 16;
+      const manyRows = PITCHES.length > 10;
       const minCell = manyRows ? (isMobile ? 14 : isTablet ? 16 : 18) : (isMobile ? 26 : isTablet ? 34 : 42);
       const maxCell = manyRows ? (isMobile ? 24 : isTablet ? 30 : 36) : (isMobile ? 42 : isTablet ? 56 : 88);
       const containerRect = els.canvasContainer.getBoundingClientRect();
