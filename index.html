@@ -1,21 +1,10 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><style>body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
-  padding: 20px;
-  background: #eaf3ff;
-  text-align: center;
-}
-h1{ color:#1e40af }
-button{
-  background:#2563eb; color:white; border:0; padding:10px 18px; border-radius:10px;
-}
-button:hover{ filter:brightness(.95) }</style></head>
-<body>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>세상의 모든 소리</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23fb7185'/%3E%3Cstop offset='1' stop-color='%236366f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M40 15v24.5a8 8 0 1 1-4-6.93V21l-14 3.5v18a8 8 0 1 1-4-6.93V19.2c0-1.83 1.24-3.42 3.01-3.86L40 10.5V15z' fill='white'/%3E%3C/svg%3E">
   
   <!-- Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css" />
@@ -31,7 +20,21 @@ button:hover{ filter:brightness(.95) }</style></head>
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { font-family: 'Pretendard GOV', sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    :root {
+      --card-glass: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(255, 255, 255, 0.95);
+    }
+
+    body {
+      font-family: 'Pretendard GOV', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.14), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(251, 113, 133, 0.12), transparent 40%),
+        linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
     .font-black-han { font-family: 'Black Han Sans', sans-serif; }
     
     /* Custom Scrollbar */
@@ -46,6 +49,50 @@ button:hover{ filter:brightness(.95) }</style></head>
     /* Transitions */
     .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     .note-block { transition: background-color 0.2s; }
+
+    #canvas-scroll-container,
+    #footer-controls,
+    header {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #canvas-scroll-container {
+      background: var(--card-glass);
+      border-color: var(--card-border);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+
+    header,
+    #footer-controls {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    #main-stage {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 767px) {
+      header { padding: 10px 12px; }
+      #header-controls { gap: 8px; }
+      #canvas-scroll-container {
+        border-radius: 18px;
+      }
+      #footer-controls {
+        padding-top: 10px;
+        padding-bottom: 8px;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 1180px) {
+      #main-stage { max-width: 100%; }
+      #footer-controls .max-w-7xl { max-width: 100%; }
+      #footer-controls .lg\\:flex-row { gap: 10px; }
+    }
   </style>
 </head>
 <body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-hidden">
@@ -94,8 +141,9 @@ button:hover{ filter:brightness(.95) }</style></head>
   </header>
 
   <!-- Main Canvas -->
-  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-6 overflow-hidden relative">
-    <div class="flex-1 bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto overflow-y-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
+  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-4 xl:p-5 overflow-hidden relative min-h-0">
+    <div id="main-stage" class="flex-1 min-h-0">
+    <div class="h-full bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
       
       <!-- Sidebar (Pitches) -->
       <div id="sidebar-pitches" class="sticky left-0 z-20 w-10 md:w-16 bg-white border-r-2 border-gray-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] flex flex-col shrink-0">
@@ -127,6 +175,7 @@ button:hover{ filter:brightness(.95) }</style></head>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
@@ -167,9 +216,14 @@ button:hover{ filter:brightness(.95) }</style></head>
           <button id="btn-help" class="flex items-center justify-center p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors" title="사용법 보기">
             <i data-lucide="help-circle" class="w-4 h-4 md:w-5 md:h-5"></i>
           </button>
-          <button id="btn-lang" class="flex items-center gap-1 md:gap-1.5 p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors">
-            <i data-lucide="globe" class="w-4 h-4"></i><span class="text-xs md:text-sm hidden md:inline" data-i18n="langToggle">English</span>
-          </button>
+          <div class="flex items-center gap-1.5 px-2.5 py-2 md:px-3 md:py-2.5 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl border border-gray-100">
+            <i data-lucide="globe" class="w-4 h-4 shrink-0"></i>
+            <select id="lang-select" class="bg-transparent text-xs md:text-sm font-bold outline-none cursor-pointer pr-1">
+              <option value="ko">한국어</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -194,6 +248,7 @@ button:hover{ filter:brightness(.95) }</style></head>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">↔️</span> <span data-i18n="help2">길게 늘리기...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎹</span> <span data-i18n="help3">악기 바꾸기...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎙️</span> <span data-i18n="help4">내 소리 녹음...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🌐</span> <span data-i18n="help5">언어 변경...</span></p>
       </div>
       <div class="mt-6 md:mt-8 text-center">
         <button id="btn-ok-help" class="bg-sky-500 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-sky-400 transition-colors shadow-md w-full sm:w-auto" data-i18n="helpBtn">네, 알겠어요!</button>
@@ -206,8 +261,8 @@ button:hover{ filter:brightness(.95) }</style></head>
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl p-6 relative flex flex-col items-center min-w-[300px] transform scale-95 transition-transform duration-300" id="modal-confirm-content">
       <h3 class="text-lg md:text-xl font-bold mb-6 text-gray-800" id="confirm-msg">모든 음표를 지우시겠습니까?</h3>
       <div class="flex gap-4 w-full justify-center">
-        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto" id="btn-cancel-text">취소</button>
-        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto" id="btn-confirm-text">확인</button>
+        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto">취소</button>
+        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto">확인</button>
       </div>
     </div>
   </div>
@@ -222,12 +277,13 @@ button:hover{ filter:brightness(.95) }</style></head>
         help2: '길게 늘리기: 블록 오른쪽 끝의 흰색 부분을 잡고 옆으로 당기면 소리가 길어져요.',
         help3: '악기 바꾸기: 화면 아래쪽의 메뉴를 눌러 다양한 악기 소리를 골라보세요.',
         help4: "내 소리 녹음: 악기를 '내 소리'로 바꾸고 🔴 버튼을 눌러보세요. 강아지 소리, 목소리 등을 녹음하면 나만의 악기가 됩니다!",
+        help5: '언어 변경: 하단 우측의 언어 선택 드롭다운에서 한국어/English/日本語를 바로 바꿀 수 있어요.',
         helpBtn: '네, 알겠어요!', recordNew: '새 소리 녹음', recordStop: '정지 (녹음 중...)', recordRetry: '다시 녹음 (최대 3초)',
         toastNoNote: '음표를 먼저 찍어주세요! 🎵', toastMixing: '음원 믹싱 중... (약 10초 정도 소요됩니다) 🎧', toastDone: '다운로드 완료! 🎉', toastFail: '다운로드 실패: ',
         toastShareMic: "링크 복사 완료! ('내 소리'는 피아노로 변경되어 공유됩니다) 🔗", toastShare: '링크가 복사되었습니다! 친구에게 공유해보세요 🔗',
         toastShareFail: '링크 복사에 실패했습니다.', toastRecDone: '🎤 녹음 완료! 블록 길이를 늘리면 소리가 반복됩니다.', toastMicErr: '마이크 접근 권한이 필요합니다! 🎙️',
-        langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도'],
-        chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
+        langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도', '시', '라', '솔', '파', '미', '레', '도'],
+        chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
         instNames: { piano: '그랜드 피아노', marimba: '마림바', strings: '클래식 현악기', pluck: '어쿠스틱 기타', synth: '레트로 신디사이저', drum: '전자 드럼', mic: '내 소리' },
         createdBy: 'Created by. 교육뮤지컬 꿈꾸는 치수쌤', confirmClear: '모든 음표를 지우시겠습니까?', cancel: '취소', confirm: '확인'
       },
@@ -238,14 +294,32 @@ button:hover{ filter:brightness(.95) }</style></head>
         help2: 'Extend Length: Drag the white handle on the right of a block to make it longer.',
         help3: 'Change Instruments: Use the menu at the bottom to choose different sounds.',
         help4: "Record Sound: Change instrument to 'My Sound' and press 🔴. Record anything to make your own instrument!",
+        help5: 'Language: Use the language dropdown at the bottom right to switch 한국어 / English / 日本語 instantly.',
         helpBtn: 'Got it!', recordNew: 'Record Sound', recordStop: 'Stop (Recording...)', recordRetry: 'Record Again (Max 3s)',
         toastNoNote: 'Please add some notes first! 🎵', toastMixing: 'Mixing audio... (Takes about 10 seconds) 🎧', toastDone: 'Download complete! 🎉', toastFail: 'Download failed: ',
         toastShareMic: "Link copied! ('My Sound' will be shared as a piano) 🔗", toastShare: 'Link copied! Share it with your friends 🔗',
         toastShareFail: 'Failed to copy link.', toastRecDone: '🎤 Recording complete! Extend blocks to loop the sound.', toastMicErr: 'Microphone access is required! 🎙️',
-        langToggle: '한국어', pitchLabels: ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-        chromaticLabels: ['C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
+        langToggle: '한국어', pitchLabels: ['C6', 'B5', 'A5', 'G5', 'F5', 'E5', 'D5', 'C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+        chromaticLabels: ['C6', 'B5', 'A#5', 'A5', 'G#5', 'G5', 'F#5', 'F5', 'E5', 'D#5', 'D5', 'C#5', 'C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
         instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
         createdBy: 'Created by. Chisoo', confirmClear: 'Clear all notes?', cancel: 'Cancel', confirm: 'Confirm'
+      },
+      ja: {
+        title: 'せかいのすべての音', slow: 'ゆっくり', fast: 'はやく', download: '音声を保存', downloading: '保存中...', share: 'リンク共有', clearAll: 'リセット',
+        chordGuide: '和音ガイド', extendedMode: '拡張モード', addMeasure: '小節を追加', helpTitle: '✨ つかいかた ✨',
+        help1: '音を置く: 空いているマスをタップ(クリック)またはドラッグして音ブロックを作れます。',
+        help2: '長さをのばす: ブロック右端の白い部分をドラッグすると音が長くなります。',
+        help3: '楽器を変更: 下のメニューからいろいろな楽器の音を選べます。',
+        help4: "マイサウンド録音: 楽器を『マイサウンド』にして🔴を押してください。声や音を録音すると自分だけの楽器になります！",
+        help5: '言語変更: 右下の言語ドロップダウンで 한국어 / English / 日本語 をすぐ切り替えられます。',
+        helpBtn: 'わかった！', recordNew: '新しい音を録音', recordStop: '停止 (録音中...)', recordRetry: 'もう一度録音 (最大3秒)',
+        toastNoNote: '先に音符を置いてください！🎵', toastMixing: '音声をミックス中...（約10秒）🎧', toastDone: 'ダウンロード完了！🎉', toastFail: 'ダウンロード失敗: ',
+        toastShareMic: "リンクをコピーしました！（『マイサウンド』はピアノとして共有されます）🔗", toastShare: 'リンクをコピーしました！お友だちにシェアしよう 🔗',
+        toastShareFail: 'リンクのコピーに失敗しました。', toastRecDone: '🎤 録音が完了しました！ブロックを伸ばすと音が繰り返されます。', toastMicErr: 'マイクへのアクセス許可が必要です！🎙️',
+        langToggle: '한국어', pitchLabels: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
+        chromaticLabels: ['ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド'],
+        instNames: { piano: 'グランドピアノ', marimba: 'マリンバ', strings: 'クラシックストリングス', pluck: 'アコースティックギター', synth: 'レトロシンセ', drum: '電子ドラム', mic: 'マイサウンド' },
+        createdBy: 'Created by. Chisoo', confirmClear: 'すべての音符を消しますか？', cancel: 'キャンセル', confirm: '確認'
       }
     };
 
@@ -295,40 +369,45 @@ button:hover{ filter:brightness(.95) }</style></head>
       }
     };
 
+    const DIATONIC_BASE = [
+      ['C6', 84, 'bg-pink-500', 'hover:bg-pink-400'], ['B5', 83, 'bg-purple-500', 'hover:bg-purple-400'],
+      ['A5', 81, 'bg-blue-500', 'hover:bg-blue-400'], ['G5', 79, 'bg-teal-500', 'hover:bg-teal-400'],
+      ['F5', 77, 'bg-green-500', 'hover:bg-green-400'], ['E5', 76, 'bg-yellow-400', 'hover:bg-yellow-300'],
+      ['D5', 74, 'bg-orange-400', 'hover:bg-orange-300'], ['C5', 72, 'bg-red-500', 'hover:bg-red-400'],
+      ['B4', 71, 'bg-purple-500', 'hover:bg-purple-400'], ['A4', 69, 'bg-blue-500', 'hover:bg-blue-400'],
+      ['G4', 67, 'bg-teal-500', 'hover:bg-teal-400'], ['F4', 65, 'bg-green-500', 'hover:bg-green-400'],
+      ['E4', 64, 'bg-yellow-400', 'hover:bg-yellow-300'], ['D4', 62, 'bg-orange-400', 'hover:bg-orange-300'],
+      ['C4', 60, 'bg-red-500', 'hover:bg-red-400'],
+    ];
+
+    const CHROMATIC_BASE = [
+      ['C6', 84], ['B5', 83], ['A#5', 82], ['A5', 81], ['G#5', 80], ['G5', 79], ['F#5', 78], ['F5', 77], ['E5', 76], ['D#5', 75], ['D5', 74], ['C#5', 73], ['C5', 72],
+      ['B4', 71], ['A#4', 70], ['A4', 69], ['G#4', 68], ['G4', 67], ['F#4', 66], ['F4', 65], ['E4', 64], ['D#4', 63], ['D4', 62], ['C#4', 61], ['C4', 60],
+    ];
+
+    const getDiatonicPitches = (lang = state.lang) => {
+      const labels = translations[lang].pitchLabels;
+      return DIATONIC_BASE.map(([id, midi, color, hover], idx) => ({ id, midi, color, hover, label: labels[idx] || id }));
+    };
+
+    const getChromaticPitches = (lang = state.lang) => {
+      const labels = translations[lang].chromaticLabels;
+      return CHROMATIC_BASE.map(([id, midi], idx) => ({
+        id,
+        midi,
+        color: id.includes('#') ? 'bg-slate-700' : DIATONIC_BASE.find(d => d[0] === id)?.[2] || 'bg-pink-500',
+        hover: id.includes('#') ? 'hover:bg-slate-600' : DIATONIC_BASE.find(d => d[0] === id)?.[3] || 'hover:bg-pink-400',
+        label: labels[idx] || id
+      }));
+    };
+
     const updatePitches = () => {
-      const tLang = translations[state.lang];
-      if (state.isExtended) {
-        PITCHES = [
-          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.chromaticLabels[0] },
-          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.chromaticLabels[1] },
-          { id: 'A#4', midi: 70, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[2] },
-          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.chromaticLabels[3] },
-          { id: 'G#4', midi: 68, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[4] },
-          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.chromaticLabels[5] },
-          { id: 'F#4', midi: 66, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[6] },
-          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.chromaticLabels[7] },
-          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.chromaticLabels[8] },
-          { id: 'D#4', midi: 63, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[9] },
-          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.chromaticLabels[10] },
-          { id: 'C#4', midi: 61, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[11] },
-          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.chromaticLabels[12] },
-        ];
-      } else {
-        PITCHES = [
-          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.pitchLabels[0] },
-          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.pitchLabels[1] },
-          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.pitchLabels[2] },
-          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.pitchLabels[3] },
-          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.pitchLabels[4] },
-          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.pitchLabels[5] },
-          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.pitchLabels[6] },
-          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.pitchLabels[7] },
-        ];
-      }
+      PITCHES = state.isExtended ? getChromaticPitches(state.lang) : getDiatonicPitches(state.lang);
     };
 
     // --- DOM Elements ---
     const els = {
+      canvasContainer: document.getElementById('canvas-scroll-container'),
       sidebar: document.getElementById('sidebar-pitches'),
       gridArea: document.getElementById('grid-area'),
       gridRows: document.getElementById('grid-rows'),
@@ -350,7 +429,7 @@ button:hover{ filter:brightness(.95) }</style></head>
       btnClear: document.getElementById('btn-clear'),
       btnDownload: document.getElementById('btn-download'),
       btnShare: document.getElementById('btn-share'),
-      btnLang: document.getElementById('btn-lang'),
+      langSelect: document.getElementById('lang-select'),
       btnHelp: document.getElementById('btn-help'),
       modalHelp: document.getElementById('modal-help'),
       modalConfirm: document.getElementById('modal-confirm'),
@@ -391,6 +470,7 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.confirmMsg.textContent = tLang.confirmClear;
       els.btnCancelClear.textContent = tLang.cancel;
       els.btnOkClear.textContent = tLang.confirm;
+      els.langSelect.value = state.lang;
       
       if(state.isRecording) els.recordText.textContent = tLang.recordStop;
       else if(state.recordedUrl) els.recordText.textContent = tLang.recordRetry;
@@ -407,8 +487,20 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.gridRows.innerHTML = '';
       els.gridCols.innerHTML = '';
 
-      // 완벽한 정사각형 블록을 위해 캔버스 영역 및 행 높이를 명시적 픽셀로 고정
-      const cellSize = window.innerWidth < 768 ? 40 : 48; // 모바일 40px, PC 48px
+      // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth < 1024;
+      const minCell = isMobile ? 26 : isTablet ? 34 : 42;
+      const maxCell = isMobile ? 42 : isTablet ? 56 : 88;
+      const containerRect = els.canvasContainer.getBoundingClientRect();
+      const availableWidth = containerRect.width - (isMobile ? 54 : 82);
+      const availableHeight = containerRect.height - 8;
+      const targetSteps = Math.min(state.totalSteps, 32);
+      const targetRows = PITCHES.length || 8;
+      const fittedCell = Math.floor(availableWidth / targetSteps);
+      const fittedCellByHeight = Math.floor(availableHeight / targetRows);
+      const fitCell = Math.min(fittedCell || maxCell, fittedCellByHeight || maxCell);
+      const cellSize = Math.max(minCell, Math.min(maxCell, fitCell));
       els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
       els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
       
@@ -753,8 +845,8 @@ button:hover{ filter:brightness(.95) }</style></head>
     els.btnOkHelp.addEventListener('click', closeHelp);
     els.btnCloseHelp.addEventListener('click', closeHelp);
 
-    els.btnLang.addEventListener('click', () => {
-      state.lang = state.lang === 'ko' ? 'en' : 'ko';
+    els.langSelect.addEventListener('change', (e) => {
+      state.lang = e.target.value;
       applyTranslations();
     });
 
@@ -864,10 +956,4 @@ button:hover{ filter:brightness(.95) }</style></head>
     init();
   </script>
 </body>
-</html><script>function showAlert(){
-  const box = document.createElement('div');
-  box.textContent = '버튼이 클릭되었습니다! ' + new Date().toLocaleTimeString();
-  box.style.cssText = 'margin-top:20px;padding:12px;border:1px solid #93c5fd;background:#dbeafe;border-radius:10px;color:#1e40af';
-  document.body.appendChild(box);
-}
-console.log('콘솔 테스트: 정상 동작');</script></body></html>
+</html>
