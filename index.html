@@ -242,6 +242,11 @@
   <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg text-sm md:text-base font-bold transition-all duration-300 transform scale-0 opacity-0 z-50 whitespace-nowrap pointer-events-none">
     메시지
   </div>
+
+  <div id="note-context-menu" class="fixed z-[60] hidden min-w-[140px] bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl p-1.5">
+    <button id="menu-duplicate" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-sm font-semibold text-slate-700" data-i18n="duplicate">복제</button>
+    <button id="menu-delete" class="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-50 text-sm font-semibold text-rose-600" data-i18n="delete">삭제</button>
+  </div>
   
   <!-- Help Modal -->
   <div id="modal-help" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
@@ -256,6 +261,7 @@
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🌐</span> <span data-i18n="help5">언어 변경...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🖱️</span> <span data-i18n="help6">Shift 드래그...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🧹</span> <span data-i18n="help7">선택 삭제...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🧭</span> <span data-i18n="help8">오른쪽 클릭 메뉴...</span></p>
       </div>
       <div class="mt-6 md:mt-8 text-center">
         <button id="btn-ok-help" class="bg-sky-500 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-sky-400 transition-colors shadow-md w-full sm:w-auto" data-i18n="helpBtn">네, 알겠어요!</button>
@@ -287,11 +293,13 @@
         help5: '언어 변경: 하단 우측의 언어 선택 드롭다운에서 한국어/English/日本語를 바로 바꿀 수 있어요.',
         help6: '여러 블록 선택: Shift 키를 누른 채 드래그해서 여러 블록을 고른 뒤, 핸들을 드래그하면 길이를 한 번에 늘리거나 줄일 수 있어요.',
         help7: '선택 삭제: 여러 블록을 선택한 뒤 [선택 삭제] 버튼 또는 키보드 Delete/Backspace로 한 번에 지울 수 있어요.',
+        help8: '오른쪽 클릭 메뉴: 블록을 오른쪽 클릭하면 복제/삭제를 빠르게 실행할 수 있어요.',
         helpBtn: '네, 알겠어요!', recordNew: '새 소리 녹음', recordStop: '정지 (녹음 중...)', recordRetry: '다시 녹음 (최대 3초)',
         toastNoNote: '음표를 먼저 찍어주세요! 🎵', toastMixing: '음원 믹싱 중... (약 10초 정도 소요됩니다) 🎧', toastDone: '다운로드 완료! 🎉', toastFail: '다운로드 실패: ',
         toastShareMic: "링크 복사 완료! ('내 소리'는 피아노로 변경되어 공유됩니다) 🔗", toastShare: '링크가 복사되었습니다! 친구에게 공유해보세요 🔗',
         toastShareFail: '링크 복사에 실패했습니다.', toastRecDone: '🎤 녹음 완료! 블록 길이를 늘리면 소리가 반복됩니다.', toastMicErr: '마이크 접근 권한이 필요합니다! 🎙️',
         deleteSelected: '선택 삭제', toastDeletedSelected: '선택한 블록을 삭제했어요. 🧹',
+        duplicate: '복제', delete: '삭제', duplicateSelected: '선택 복제', deleteSelectedMenu: '선택 삭제', toastDuplicated: '블록을 복제했어요. ✨',
         langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도', '시', '라', '솔', '파', '미', '레', '도'],
         chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
         instNames: { piano: '그랜드 피아노', marimba: '마림바', strings: '클래식 현악기', pluck: '어쿠스틱 기타', synth: '레트로 신디사이저', drum: '전자 드럼', mic: '내 소리' },
@@ -307,11 +315,13 @@
         help5: 'Language: Use the language dropdown at the bottom right to switch 한국어 / English / 日本語 instantly.',
         help6: 'Multi-select blocks: Hold Shift and drag to select many blocks, then drag one resize handle to resize all selected blocks together.',
         help7: 'Delete selected: after selecting multiple blocks, use [Delete Selected] or press Delete/Backspace to remove them at once.',
+        help8: 'Right-click menu: right-click a block to quickly duplicate or delete.',
         helpBtn: 'Got it!', recordNew: 'Record Sound', recordStop: 'Stop (Recording...)', recordRetry: 'Record Again (Max 3s)',
         toastNoNote: 'Please add some notes first! 🎵', toastMixing: 'Mixing audio... (Takes about 10 seconds) 🎧', toastDone: 'Download complete! 🎉', toastFail: 'Download failed: ',
         toastShareMic: "Link copied! ('My Sound' will be shared as a piano) 🔗", toastShare: 'Link copied! Share it with your friends 🔗',
         toastShareFail: 'Failed to copy link.', toastRecDone: '🎤 Recording complete! Extend blocks to loop the sound.', toastMicErr: 'Microphone access is required! 🎙️',
         deleteSelected: 'Delete Selected', toastDeletedSelected: 'Selected blocks deleted. 🧹',
+        duplicate: 'Duplicate', delete: 'Delete', duplicateSelected: 'Duplicate Selected', deleteSelectedMenu: 'Delete Selected', toastDuplicated: 'Block(s) duplicated. ✨',
         langToggle: '한국어', pitchLabels: ['C6', 'B5', 'A5', 'G5', 'F5', 'E5', 'D5', 'C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
         chromaticLabels: ['C6', 'B5', 'A#5', 'A5', 'G#5', 'G5', 'F#5', 'F5', 'E5', 'D#5', 'D5', 'C#5', 'C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
         instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
@@ -327,11 +337,13 @@
         help5: '言語変更: 右下の言語ドロップダウンで 한국어 / English / 日本語 をすぐ切り替えられます。',
         help6: '複数選択: Shiftキーを押しながらドラッグで複数ブロックを選び、ハンドルを動かすとまとめて長さを変更できます。',
         help7: '選択削除: 複数ブロックを選んでから［選択削除］ボタン、または Delete/Backspace で一度に削除できます。',
+        help8: '右クリックメニュー: ブロックを右クリックすると複製/削除をすばやく実行できます。',
         helpBtn: 'わかった！', recordNew: '新しい音を録音', recordStop: '停止 (録音中...)', recordRetry: 'もう一度録音 (最大3秒)',
         toastNoNote: '先に音符を置いてください！🎵', toastMixing: '音声をミックス中...（約10秒）🎧', toastDone: 'ダウンロード完了！🎉', toastFail: 'ダウンロード失敗: ',
         toastShareMic: "リンクをコピーしました！（『マイサウンド』はピアノとして共有されます）🔗", toastShare: 'リンクをコピーしました！お友だちにシェアしよう 🔗',
         toastShareFail: 'リンクのコピーに失敗しました。', toastRecDone: '🎤 録音が完了しました！ブロックを伸ばすと音が繰り返されます。', toastMicErr: 'マイクへのアクセス許可が必要です！🎙️',
         deleteSelected: '選択削除', toastDeletedSelected: '選択したブロックを削除しました。🧹',
+        duplicate: '複製', delete: '削除', duplicateSelected: '選択を複製', deleteSelectedMenu: '選択を削除', toastDuplicated: 'ブロックを複製しました。✨',
         langToggle: '한국어', pitchLabels: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
         chromaticLabels: ['ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド'],
         instNames: { piano: 'グランドピアノ', marimba: 'マリンバ', strings: 'クラシックストリングス', pluck: 'アコースティックギター', synth: 'レトロシンセ', drum: '電子ドラム', mic: 'マイサウンド' },
@@ -363,7 +375,8 @@
       isDrawing: false,
       resizing: null, // { ids, startX, originalDurations, colWidth }
       selectedNoteIds: [],
-      selectionDrag: null // { startX, startY, currentX, currentY, colWidth, rowHeight }
+      selectionDrag: null, // { startX, startY, currentX, currentY, colWidth, rowHeight }
+      contextMenu: { visible: false, x: 0, y: 0, targetId: null }
     };
 
     let synth = null;
@@ -376,14 +389,43 @@
 
     // --- Audio Setup ---
     const createSynth = (inst) => {
-      const vol = new Tone.Volume(-8).toDestination();
+      const vol = new Tone.Volume(-10).toDestination();
       switch (inst) {
-        case 'marimba': return new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3.01, modulationIndex: 10, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 } }).connect(vol);
-        case 'strings': return new Tone.PolySynth(Tone.AMSynth, { harmonicity: 1, oscillator: { type: 'sawtooth' }, envelope: { attack: 0.1, decay: 0.1, sustain: 1, release: 1.2 } }).connect(vol);
-        case 'pluck': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }).connect(vol);
-        case 'synth': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fatsawtooth', count: 3, spread: 30 }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.5 } }).connect(vol);
-        case 'drum': return new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.05, octaves: 4, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4, attackCurve: 'exponential' } }).connect(vol);
-        case 'piano': default: return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'amsine' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 1.2 } }).connect(vol);
+        case 'marimba':
+          return new Tone.PolySynth(Tone.FMSynth, {
+            harmonicity: 3.4, modulationIndex: 12,
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.22, sustain: 0.0, release: 0.2 }
+          }).connect(vol);
+        case 'strings':
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.18, decay: 0.25, sustain: 0.8, release: 1.8 }
+          }).connect(vol);
+        case 'pluck':
+          return new Tone.PolySynth(Tone.PluckSynth, {
+            attackNoise: 1.2,
+            dampening: 2800,
+            resonance: 0.9
+          }).connect(vol);
+        case 'synth':
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'fatsawtooth', count: 3, spread: 24 },
+            envelope: { attack: 0.01, decay: 0.18, sustain: 0.45, release: 0.55 }
+          }).connect(vol);
+        case 'drum':
+          return new Tone.PolySynth(Tone.MembraneSynth, {
+            pitchDecay: 0.03,
+            octaves: 2,
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.24, sustain: 0.01, release: 0.32, attackCurve: 'exponential' }
+          }).connect(vol);
+        case 'piano':
+        default:
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.008, decay: 0.35, sustain: 0.25, release: 1.0 }
+          }).connect(vol);
       }
     };
 
@@ -432,6 +474,9 @@
       gridCols: document.getElementById('grid-cols'),
       notesContainer: document.getElementById('notes-container'),
       selectionBox: document.getElementById('selection-box'),
+      contextMenu: document.getElementById('note-context-menu'),
+      menuDuplicate: document.getElementById('menu-duplicate'),
+      menuDelete: document.getElementById('menu-delete'),
       playhead: document.getElementById('playhead'),
       instrumentSelect: document.getElementById('instrument-select'),
       btnRecord: document.getElementById('btn-record'),
@@ -480,6 +525,45 @@
       if (state.selectedNoteIds.length === 0) return;
       state.selectedNoteIds = [];
       renderNotes();
+    };
+
+    const hideContextMenu = () => {
+      state.contextMenu = { visible: false, x: 0, y: 0, targetId: null };
+      els.contextMenu.classList.add('hidden');
+    };
+
+    const getContextTargetIds = () => {
+      if (!state.contextMenu.targetId) return [];
+      if (state.selectedNoteIds.includes(state.contextMenu.targetId) && state.selectedNoteIds.length > 1) return [...state.selectedNoteIds];
+      return [state.contextMenu.targetId];
+    };
+
+    const duplicateNotes = (noteIds) => {
+      if (!noteIds.length) return;
+      const originals = state.notes.filter(n => noteIds.includes(n.id));
+      if (!originals.length) return;
+      const maxStep = Math.max(...originals.map(n => n.step + n.duration));
+      const shift = maxStep < state.totalSteps ? 1 : 0;
+      const clones = originals.map(n => ({ ...n, id: `${Date.now()}-${Math.random()}`, step: Math.min(state.totalSteps - n.duration, n.step + shift) }));
+      state.notes = [...state.notes, ...clones];
+      state.selectedNoteIds = clones.map(n => n.id);
+      renderNotes();
+      updateControlsUI();
+      showToast(translations[state.lang].toastDuplicated);
+    };
+
+    const showContextMenu = (x, y, targetId) => {
+      const tLang = translations[state.lang];
+      state.contextMenu = { visible: true, x, y, targetId };
+      const useSelected = state.selectedNoteIds.includes(targetId) && state.selectedNoteIds.length > 1;
+      els.menuDuplicate.textContent = useSelected ? tLang.duplicateSelected : tLang.duplicate;
+      els.menuDelete.textContent = useSelected ? tLang.deleteSelectedMenu : tLang.delete;
+      const menuWidth = 160;
+      const menuHeight = 96;
+      const left = Math.min(x, window.innerWidth - menuWidth - 12);
+      const top = Math.min(y, window.innerHeight - menuHeight - 12);
+      Object.assign(els.contextMenu.style, { left: `${left}px`, top: `${top}px` });
+      els.contextMenu.classList.remove('hidden');
     };
 
     const deleteSelectedNotes = () => {
@@ -648,6 +732,16 @@
           if(state.isDrawing || state.resizing) return;
           state.selectedNoteIds = [note.id];
           renderNotes();
+        });
+
+        noteDiv.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!state.selectedNoteIds.includes(note.id)) {
+            state.selectedNoteIds = [note.id];
+            renderNotes();
+          }
+          showContextMenu(e.clientX, e.clientY, note.id);
         });
 
         // Note Resize
@@ -827,6 +921,7 @@
     };
 
     els.gridArea.addEventListener('pointerdown', async (e) => {
+      hideContextMenu();
       if (!state.isToneStarted) { await Tone.start(); state.isToneStarted = true; }
       if (e.target.closest('.note-block') || state.resizing) return;
       if (e.shiftKey) {
@@ -941,6 +1036,24 @@
     els.btnPlay.addEventListener('click', togglePlayback);
     els.btnStop.addEventListener('click', stopPlayback);
     els.btnDeleteSelected.addEventListener('click', deleteSelectedNotes);
+    els.menuDuplicate.addEventListener('click', () => {
+      const ids = getContextTargetIds();
+      duplicateNotes(ids);
+      hideContextMenu();
+    });
+    els.menuDelete.addEventListener('click', () => {
+      const ids = getContextTargetIds();
+      if (!ids.length) return;
+      if (ids.length === 1) {
+        state.notes = state.notes.filter(n => n.id !== ids[0]);
+        state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== ids[0]);
+        renderNotes();
+      } else {
+        state.selectedNoteIds = ids;
+        deleteSelectedNotes();
+      }
+      hideContextMenu();
+    });
     els.bpmSlider.addEventListener('input', (e) => { state.bpm = Number(e.target.value); els.bpmDisplay.textContent = `${state.bpm} BPM`; if(state.isPlaying){ stopPlayback(); togglePlayback(); } });
     els.instrumentSelect.addEventListener('change', (e) => {
       state.instrument = e.target.value;
@@ -987,11 +1100,19 @@
     window.addEventListener('keydown', (e) => {
       const activeTag = document.activeElement?.tagName;
       if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+      if (e.key === 'Escape') { hideContextMenu(); return; }
       if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedNoteIds.length > 0) {
         e.preventDefault();
         deleteSelectedNotes();
       }
     });
+
+    window.addEventListener('pointerdown', (e) => {
+      if (!state.contextMenu.visible) return;
+      if (e.target.closest('#note-context-menu')) return;
+      hideContextMenu();
+    });
+    window.addEventListener('scroll', hideContextMenu, true);
 
     els.btnRecord.addEventListener('click', async () => {
       const tLang = translations[state.lang];
