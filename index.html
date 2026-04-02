@@ -75,12 +75,6 @@
       margin: 0 auto;
     }
 
-    @media (min-width: 1280px) {
-      #canvas-scroll-container {
-        max-height: calc(100vh - 218px);
-      }
-    }
-
     @media (max-width: 767px) {
       header { padding: 10px 12px; }
       #header-controls { gap: 8px; }
@@ -215,9 +209,14 @@
           <button id="btn-help" class="flex items-center justify-center p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors" title="사용법 보기">
             <i data-lucide="help-circle" class="w-4 h-4 md:w-5 md:h-5"></i>
           </button>
-          <button id="btn-lang" class="flex items-center gap-1 md:gap-1.5 p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors">
-            <i data-lucide="globe" class="w-4 h-4"></i><span class="text-xs md:text-sm hidden md:inline" data-i18n="langToggle">English</span>
-          </button>
+          <div class="flex items-center gap-1.5 px-2.5 py-2 md:px-3 md:py-2.5 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl border border-gray-100">
+            <i data-lucide="globe" class="w-4 h-4 shrink-0"></i>
+            <select id="lang-select" class="bg-transparent text-xs md:text-sm font-bold outline-none cursor-pointer pr-1">
+              <option value="ko">한국어</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -415,7 +414,7 @@
       btnClear: document.getElementById('btn-clear'),
       btnDownload: document.getElementById('btn-download'),
       btnShare: document.getElementById('btn-share'),
-      btnLang: document.getElementById('btn-lang'),
+      langSelect: document.getElementById('lang-select'),
       btnHelp: document.getElementById('btn-help'),
       modalHelp: document.getElementById('modal-help'),
       modalConfirm: document.getElementById('modal-confirm'),
@@ -456,6 +455,7 @@
       els.confirmMsg.textContent = tLang.confirmClear;
       els.btnCancelClear.textContent = tLang.cancel;
       els.btnOkClear.textContent = tLang.confirm;
+      els.langSelect.value = state.lang;
       
       if(state.isRecording) els.recordText.textContent = tLang.recordStop;
       else if(state.recordedUrl) els.recordText.textContent = tLang.recordRetry;
@@ -475,12 +475,17 @@
       // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
       const isMobile = window.innerWidth < 640;
       const isTablet = window.innerWidth < 1024;
-      const minCell = isMobile ? 28 : isTablet ? 34 : 40;
-      const maxCell = isMobile ? 38 : isTablet ? 48 : 58;
-      const availableWidth = els.canvasContainer.getBoundingClientRect().width - (isMobile ? 58 : 86);
+      const minCell = isMobile ? 26 : isTablet ? 34 : 42;
+      const maxCell = isMobile ? 42 : isTablet ? 56 : 88;
+      const containerRect = els.canvasContainer.getBoundingClientRect();
+      const availableWidth = containerRect.width - (isMobile ? 54 : 82);
+      const availableHeight = containerRect.height - 8;
       const targetSteps = Math.min(state.totalSteps, 32);
+      const targetRows = PITCHES.length || 8;
       const fittedCell = Math.floor(availableWidth / targetSteps);
-      const cellSize = Math.max(minCell, Math.min(maxCell, fittedCell || maxCell));
+      const fittedCellByHeight = Math.floor(availableHeight / targetRows);
+      const fitCell = Math.min(fittedCell || maxCell, fittedCellByHeight || maxCell);
+      const cellSize = Math.max(minCell, Math.min(maxCell, fitCell));
       els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
       els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
       
@@ -825,10 +830,8 @@
     els.btnOkHelp.addEventListener('click', closeHelp);
     els.btnCloseHelp.addEventListener('click', closeHelp);
 
-    els.btnLang.addEventListener('click', () => {
-      const langOrder = ['ko', 'en', 'ja'];
-      const currentIndex = langOrder.indexOf(state.lang);
-      state.lang = langOrder[(currentIndex + 1) % langOrder.length];
+    els.langSelect.addEventListener('change', (e) => {
+      state.lang = e.target.value;
       applyTranslations();
     });
 
