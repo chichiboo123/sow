@@ -643,11 +643,12 @@
       // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
       const isMobile = window.innerWidth < 640;
       const isTablet = window.innerWidth < 1024;
-      const minCell = isMobile ? 26 : isTablet ? 34 : 42;
-      const maxCell = isMobile ? 42 : isTablet ? 56 : 88;
+      const manyRows = PITCHES.length > 16;
+      const minCell = manyRows ? (isMobile ? 14 : isTablet ? 16 : 18) : (isMobile ? 26 : isTablet ? 34 : 42);
+      const maxCell = manyRows ? (isMobile ? 24 : isTablet ? 30 : 36) : (isMobile ? 42 : isTablet ? 56 : 88);
       const containerRect = els.canvasContainer.getBoundingClientRect();
       const availableWidth = containerRect.width - (isMobile ? 54 : 82);
-      const availableHeight = containerRect.height - 8;
+      const availableHeight = containerRect.height - (isMobile ? 12 : 16);
       const targetSteps = Math.min(state.totalSteps, 32);
       const targetRows = PITCHES.length || 8;
       const fittedCell = Math.floor(availableWidth / targetSteps);
