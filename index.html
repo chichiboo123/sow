@@ -127,6 +127,9 @@
         <button id="btn-stop" class="p-2.5 md:p-3 rounded-full bg-rose-200 text-rose-700 shadow-sm hover:bg-rose-300 transition-transform active:scale-95">
           <i data-lucide="square" class="w-3 h-3 md:w-4 md:h-4 fill-current"></i>
         </button>
+        <button id="btn-mute" class="p-2.5 md:p-3 rounded-full bg-slate-200 text-slate-700 shadow-sm hover:bg-slate-300 transition-transform active:scale-95" title="음소거">
+          <span id="icon-mute-wrapper" class="flex items-center justify-center"><i data-lucide="volume-2" class="w-4 h-4 md:w-5 md:h-5"></i></span>
+        </button>
       </div>
 
       <div class="flex items-center gap-2 md:gap-3 bg-white border-2 border-sky-100 px-3 py-1.5 md:px-4 md:py-2 rounded-2xl shadow-sm hidden sm:flex">
@@ -300,6 +303,7 @@
         toastShareFail: '링크 복사에 실패했습니다.', toastRecDone: '🎤 녹음 완료! 블록 길이를 늘리면 소리가 반복됩니다.', toastMicErr: '마이크 접근 권한이 필요합니다! 🎙️',
         deleteSelected: '선택 삭제', toastDeletedSelected: '선택한 블록을 삭제했어요. 🧹',
         duplicate: '복제', delete: '삭제', duplicateSelected: '선택 복제', deleteSelectedMenu: '선택 삭제', toastDuplicated: '블록을 복제했어요. ✨',
+        mute: '음소거', unmute: '음소거 해제',
         langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도', '시', '라', '솔', '파', '미', '레', '도'],
         chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
         instNames: { piano: '그랜드 피아노', marimba: '마림바', strings: '클래식 현악기', pluck: '어쿠스틱 기타', synth: '레트로 신디사이저', drum: '전자 드럼', mic: '내 소리' },
@@ -322,6 +326,7 @@
         toastShareFail: 'Failed to copy link.', toastRecDone: '🎤 Recording complete! Extend blocks to loop the sound.', toastMicErr: 'Microphone access is required! 🎙️',
         deleteSelected: 'Delete Selected', toastDeletedSelected: 'Selected blocks deleted. 🧹',
         duplicate: 'Duplicate', delete: 'Delete', duplicateSelected: 'Duplicate Selected', deleteSelectedMenu: 'Delete Selected', toastDuplicated: 'Block(s) duplicated. ✨',
+        mute: 'Mute', unmute: 'Unmute',
         langToggle: '한국어', pitchLabels: ['C6', 'B5', 'A5', 'G5', 'F5', 'E5', 'D5', 'C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
         chromaticLabels: ['C6', 'B5', 'A#5', 'A5', 'G#5', 'G5', 'F#5', 'F5', 'E5', 'D#5', 'D5', 'C#5', 'C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
         instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
@@ -344,6 +349,7 @@
         toastShareFail: 'リンクのコピーに失敗しました。', toastRecDone: '🎤 録音が完了しました！ブロックを伸ばすと音が繰り返されます。', toastMicErr: 'マイクへのアクセス許可が必要です！🎙️',
         deleteSelected: '選択削除', toastDeletedSelected: '選択したブロックを削除しました。🧹',
         duplicate: '複製', delete: '削除', duplicateSelected: '選択を複製', deleteSelectedMenu: '選択を削除', toastDuplicated: 'ブロックを複製しました。✨',
+        mute: 'ミュート', unmute: 'ミュート解除',
         langToggle: '한국어', pitchLabels: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
         chromaticLabels: ['ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド'],
         instNames: { piano: 'グランドピアノ', marimba: 'マリンバ', strings: 'クラシックストリングス', pluck: 'アコースティックギター', synth: 'レトロシンセ', drum: '電子ドラム', mic: 'マイサウンド' },
@@ -365,6 +371,7 @@
       isPlaying: false,
       currentStep: 0,
       bpm: 120,
+      isMuted: false,
       instrument: 'piano',
       showChordGuide: false,
       hoveredMidi: null,
@@ -487,7 +494,9 @@
       bpmDisplay: document.getElementById('bpm-display'),
       btnPlay: document.getElementById('btn-play'),
       btnStop: document.getElementById('btn-stop'),
+      btnMute: document.getElementById('btn-mute'),
       playIconWrapper: document.getElementById('icon-play-wrapper'),
+      muteIconWrapper: document.getElementById('icon-mute-wrapper'),
       btnChordGuide: document.getElementById('btn-chord-guide'),
       btnExtended: document.getElementById('btn-extended'),
       btnAddMeasure: document.getElementById('btn-add-measure'),
@@ -801,6 +810,17 @@
         els.btnPlay.className = "p-2.5 md:p-3 rounded-full flex items-center justify-center transition-transform active:scale-95 bg-teal-200 text-teal-700 shadow-sm hover:bg-teal-300";
         els.playIconWrapper.innerHTML = `<i data-lucide="play" class="w-4 h-4 md:w-5 md:h-5 fill-current"></i>`;
       }
+
+      const tLang = translations[state.lang];
+      if (state.isMuted) {
+        els.btnMute.className = "p-2.5 md:p-3 rounded-full bg-slate-700 text-white shadow-sm transition-transform active:scale-95";
+        els.muteIconWrapper.innerHTML = `<i data-lucide="volume-x" class="w-4 h-4 md:w-5 md:h-5"></i>`;
+        els.btnMute.title = tLang.unmute;
+      } else {
+        els.btnMute.className = "p-2.5 md:p-3 rounded-full bg-slate-200 text-slate-700 shadow-sm hover:bg-slate-300 transition-transform active:scale-95";
+        els.muteIconWrapper.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4 md:w-5 md:h-5"></i>`;
+        els.btnMute.title = tLang.mute;
+      }
       lucide.createIcons();
 
       // Exporting state
@@ -860,6 +880,12 @@
       } else {
         clearInterval(playInterval);
       }
+    };
+
+    const toggleMute = () => {
+      state.isMuted = !state.isMuted;
+      Tone.Destination.mute = state.isMuted;
+      updateControlsUI();
     };
 
     const stopPlayback = () => {
@@ -1038,6 +1064,7 @@
     });
     els.btnPlay.addEventListener('click', togglePlayback);
     els.btnStop.addEventListener('click', stopPlayback);
+    els.btnMute.addEventListener('click', toggleMute);
     els.btnDeleteSelected.addEventListener('click', deleteSelectedNotes);
     els.menuDuplicate.addEventListener('click', () => {
       const ids = getContextTargetIds();
