@@ -60,11 +60,37 @@
       background: var(--card-glass);
       border-color: var(--card-border);
       box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+      align-items: flex-start;
+      overflow-y: hidden;
     }
 
     header,
     #footer-controls {
       background: rgba(255, 255, 255, 0.86);
+    }
+
+    #main-stage {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 1280px) {
+      #canvas-scroll-container {
+        max-height: calc(100vh - 218px);
+      }
+    }
+
+    @media (max-width: 767px) {
+      header { padding: 10px 12px; }
+      #header-controls { gap: 8px; }
+      #canvas-scroll-container {
+        border-radius: 18px;
+      }
+      #footer-controls {
+        padding-top: 10px;
+        padding-bottom: 8px;
+      }
     }
   </style>
 </head>
@@ -114,8 +140,9 @@
   </header>
 
   <!-- Main Canvas -->
-  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-6 overflow-hidden relative">
-    <div class="flex-1 bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto overflow-y-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
+  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-4 xl:p-5 overflow-hidden relative min-h-0">
+    <div id="main-stage" class="flex-1 min-h-0">
+    <div class="h-full bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
       
       <!-- Sidebar (Pitches) -->
       <div id="sidebar-pitches" class="sticky left-0 z-20 w-10 md:w-16 bg-white border-r-2 border-gray-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] flex flex-col shrink-0">
@@ -147,6 +174,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
@@ -365,6 +393,7 @@
 
     // --- DOM Elements ---
     const els = {
+      canvasContainer: document.getElementById('canvas-scroll-container'),
       sidebar: document.getElementById('sidebar-pitches'),
       gridArea: document.getElementById('grid-area'),
       gridRows: document.getElementById('grid-rows'),
@@ -443,8 +472,15 @@
       els.gridRows.innerHTML = '';
       els.gridCols.innerHTML = '';
 
-      // 완벽한 정사각형 블록을 위해 캔버스 영역 및 행 높이를 명시적 픽셀로 고정
-      const cellSize = window.innerWidth < 768 ? 40 : 48; // 모바일 40px, PC 48px
+      // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth < 1024;
+      const minCell = isMobile ? 28 : isTablet ? 34 : 40;
+      const maxCell = isMobile ? 38 : isTablet ? 48 : 58;
+      const availableWidth = els.canvasContainer.getBoundingClientRect().width - (isMobile ? 58 : 86);
+      const targetSteps = Math.min(state.totalSteps, 32);
+      const fittedCell = Math.floor(availableWidth / targetSteps);
+      const cellSize = Math.max(minCell, Math.min(maxCell, fittedCell || maxCell));
       els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
       els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
       
