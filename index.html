@@ -1,16 +1,4 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><style>body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
-  padding: 20px;
-  background: #eaf3ff;
-  text-align: center;
-}
-h1{ color:#1e40af }
-button{
-  background:#2563eb; color:white; border:0; padding:10px 18px; border-radius:10px;
-}
-button:hover{ filter:brightness(.95) }</style></head>
-<body>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -31,7 +19,21 @@ button:hover{ filter:brightness(.95) }</style></head>
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { font-family: 'Pretendard GOV', sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    :root {
+      --card-glass: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(255, 255, 255, 0.95);
+    }
+
+    body {
+      font-family: 'Pretendard GOV', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.14), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(251, 113, 133, 0.12), transparent 40%),
+        linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
     .font-black-han { font-family: 'Black Han Sans', sans-serif; }
     
     /* Custom Scrollbar */
@@ -46,6 +48,50 @@ button:hover{ filter:brightness(.95) }</style></head>
     /* Transitions */
     .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     .note-block { transition: background-color 0.2s; }
+
+    #canvas-scroll-container,
+    #footer-controls,
+    header {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #canvas-scroll-container {
+      background: var(--card-glass);
+      border-color: var(--card-border);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+      align-items: flex-start;
+      overflow-y: hidden;
+    }
+
+    header,
+    #footer-controls {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    #main-stage {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 1280px) {
+      #canvas-scroll-container {
+        max-height: calc(100vh - 218px);
+      }
+    }
+
+    @media (max-width: 767px) {
+      header { padding: 10px 12px; }
+      #header-controls { gap: 8px; }
+      #canvas-scroll-container {
+        border-radius: 18px;
+      }
+      #footer-controls {
+        padding-top: 10px;
+        padding-bottom: 8px;
+      }
+    }
   </style>
 </head>
 <body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-hidden">
@@ -94,8 +140,9 @@ button:hover{ filter:brightness(.95) }</style></head>
   </header>
 
   <!-- Main Canvas -->
-  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-6 overflow-hidden relative">
-    <div class="flex-1 bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto overflow-y-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
+  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-4 xl:p-5 overflow-hidden relative min-h-0">
+    <div id="main-stage" class="flex-1 min-h-0">
+    <div class="h-full bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
       
       <!-- Sidebar (Pitches) -->
       <div id="sidebar-pitches" class="sticky left-0 z-20 w-10 md:w-16 bg-white border-r-2 border-gray-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] flex flex-col shrink-0">
@@ -127,6 +174,7 @@ button:hover{ filter:brightness(.95) }</style></head>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
@@ -206,8 +254,8 @@ button:hover{ filter:brightness(.95) }</style></head>
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl p-6 relative flex flex-col items-center min-w-[300px] transform scale-95 transition-transform duration-300" id="modal-confirm-content">
       <h3 class="text-lg md:text-xl font-bold mb-6 text-gray-800" id="confirm-msg">모든 음표를 지우시겠습니까?</h3>
       <div class="flex gap-4 w-full justify-center">
-        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto" id="btn-cancel-text">취소</button>
-        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto" id="btn-confirm-text">확인</button>
+        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto">취소</button>
+        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto">확인</button>
       </div>
     </div>
   </div>
@@ -246,6 +294,22 @@ button:hover{ filter:brightness(.95) }</style></head>
         chromaticLabels: ['C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
         instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
         createdBy: 'Created by. Chisoo', confirmClear: 'Clear all notes?', cancel: 'Cancel', confirm: 'Confirm'
+      },
+      ja: {
+        title: 'せかいのすべての音', slow: 'ゆっくり', fast: 'はやく', download: '音声を保存', downloading: '保存中...', share: 'リンク共有', clearAll: 'リセット',
+        chordGuide: '和音ガイド', extendedMode: '拡張モード', addMeasure: '小節を追加', helpTitle: '✨ つかいかた ✨',
+        help1: '音を置く: 空いているマスをタップ(クリック)またはドラッグして音ブロックを作れます。',
+        help2: '長さをのばす: ブロック右端の白い部分をドラッグすると音が長くなります。',
+        help3: '楽器を変更: 下のメニューからいろいろな楽器の音を選べます。',
+        help4: "マイサウンド録音: 楽器を『マイサウンド』にして🔴を押してください。声や音を録音すると自分だけの楽器になります！",
+        helpBtn: 'わかった！', recordNew: '新しい音を録音', recordStop: '停止 (録音中...)', recordRetry: 'もう一度録音 (最大3秒)',
+        toastNoNote: '先に音符を置いてください！🎵', toastMixing: '音声をミックス中...（約10秒）🎧', toastDone: 'ダウンロード完了！🎉', toastFail: 'ダウンロード失敗: ',
+        toastShareMic: "リンクをコピーしました！（『マイサウンド』はピアノとして共有されます）🔗", toastShare: 'リンクをコピーしました！お友だちにシェアしよう 🔗',
+        toastShareFail: 'リンクのコピーに失敗しました。', toastRecDone: '🎤 録音が完了しました！ブロックを伸ばすと音が繰り返されます。', toastMicErr: 'マイクへのアクセス許可が必要です！🎙️',
+        langToggle: '한국어', pitchLabels: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
+        chromaticLabels: ['ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド'],
+        instNames: { piano: 'グランドピアノ', marimba: 'マリンバ', strings: 'クラシックストリングス', pluck: 'アコースティックギター', synth: 'レトロシンセ', drum: '電子ドラム', mic: 'マイサウンド' },
+        createdBy: 'Created by. Chisoo', confirmClear: 'すべての音符を消しますか？', cancel: 'キャンセル', confirm: '確認'
       }
     };
 
@@ -329,6 +393,7 @@ button:hover{ filter:brightness(.95) }</style></head>
 
     // --- DOM Elements ---
     const els = {
+      canvasContainer: document.getElementById('canvas-scroll-container'),
       sidebar: document.getElementById('sidebar-pitches'),
       gridArea: document.getElementById('grid-area'),
       gridRows: document.getElementById('grid-rows'),
@@ -407,8 +472,15 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.gridRows.innerHTML = '';
       els.gridCols.innerHTML = '';
 
-      // 완벽한 정사각형 블록을 위해 캔버스 영역 및 행 높이를 명시적 픽셀로 고정
-      const cellSize = window.innerWidth < 768 ? 40 : 48; // 모바일 40px, PC 48px
+      // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth < 1024;
+      const minCell = isMobile ? 28 : isTablet ? 34 : 40;
+      const maxCell = isMobile ? 38 : isTablet ? 48 : 58;
+      const availableWidth = els.canvasContainer.getBoundingClientRect().width - (isMobile ? 58 : 86);
+      const targetSteps = Math.min(state.totalSteps, 32);
+      const fittedCell = Math.floor(availableWidth / targetSteps);
+      const cellSize = Math.max(minCell, Math.min(maxCell, fittedCell || maxCell));
       els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
       els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
       
@@ -754,7 +826,9 @@ button:hover{ filter:brightness(.95) }</style></head>
     els.btnCloseHelp.addEventListener('click', closeHelp);
 
     els.btnLang.addEventListener('click', () => {
-      state.lang = state.lang === 'ko' ? 'en' : 'ko';
+      const langOrder = ['ko', 'en', 'ja'];
+      const currentIndex = langOrder.indexOf(state.lang);
+      state.lang = langOrder[(currentIndex + 1) % langOrder.length];
       applyTranslations();
     });
 
@@ -864,10 +938,4 @@ button:hover{ filter:brightness(.95) }</style></head>
     init();
   </script>
 </body>
-</html><script>function showAlert(){
-  const box = document.createElement('div');
-  box.textContent = '버튼이 클릭되었습니다! ' + new Date().toLocaleTimeString();
-  box.style.cssText = 'margin-top:20px;padding:12px;border:1px solid #93c5fd;background:#dbeafe;border-radius:10px;color:#1e40af';
-  document.body.appendChild(box);
-}
-console.log('콘솔 테스트: 정상 동작');</script></body></html>
+</html>
