@@ -1,21 +1,10 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><style>body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
-  padding: 20px;
-  background: #eaf3ff;
-  text-align: center;
-}
-h1{ color:#1e40af }
-button{
-  background:#2563eb; color:white; border:0; padding:10px 18px; border-radius:10px;
-}
-button:hover{ filter:brightness(.95) }</style></head>
-<body>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>세상의 모든 소리</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23fb7185'/%3E%3Cstop offset='1' stop-color='%236366f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M40 15v24.5a8 8 0 1 1-4-6.93V21l-14 3.5v18a8 8 0 1 1-4-6.93V19.2c0-1.83 1.24-3.42 3.01-3.86L40 10.5V15z' fill='white'/%3E%3C/svg%3E">
   
   <!-- Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css" />
@@ -31,7 +20,21 @@ button:hover{ filter:brightness(.95) }</style></head>
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { font-family: 'Pretendard GOV', sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    :root {
+      --card-glass: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(255, 255, 255, 0.95);
+    }
+
+    body {
+      font-family: 'Pretendard GOV', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.14), transparent 35%),
+        radial-gradient(circle at 85% 10%, rgba(251, 113, 133, 0.12), transparent 40%),
+        linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
     .font-black-han { font-family: 'Black Han Sans', sans-serif; }
     
     /* Custom Scrollbar */
@@ -46,6 +49,51 @@ button:hover{ filter:brightness(.95) }</style></head>
     /* Transitions */
     .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     .note-block { transition: background-color 0.2s; }
+    .note-block.selected { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.9), 0 6px 14px rgba(30, 41, 59, 0.2); filter: saturate(1.1); }
+
+    #canvas-scroll-container,
+    #footer-controls,
+    header {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    #canvas-scroll-container {
+      background: var(--card-glass);
+      border-color: var(--card-border);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+
+    header,
+    #footer-controls {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    #main-stage {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 767px) {
+      header { padding: 10px 12px; }
+      #header-controls { gap: 8px; }
+      #canvas-scroll-container {
+        border-radius: 18px;
+      }
+      #footer-controls {
+        padding-top: 10px;
+        padding-bottom: 8px;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 1180px) {
+      #main-stage { max-width: 100%; }
+      #footer-controls .max-w-7xl { max-width: 100%; }
+      #footer-controls .lg\\:flex-row { gap: 10px; }
+    }
   </style>
 </head>
 <body class="bg-sky-50 flex flex-col min-h-screen text-slate-800 overflow-hidden">
@@ -94,8 +142,9 @@ button:hover{ filter:brightness(.95) }</style></head>
   </header>
 
   <!-- Main Canvas -->
-  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-6 overflow-hidden relative">
-    <div class="flex-1 bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto overflow-y-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
+  <main class="flex-1 flex flex-col bg-sky-50 p-2 md:p-4 xl:p-5 overflow-hidden relative min-h-0">
+    <div id="main-stage" class="flex-1 min-h-0">
+    <div class="h-full bg-white rounded-2xl md:rounded-3xl shadow-xl border-2 md:border-4 border-white overflow-x-auto relative flex sleek-scrollbar transition-all duration-300" id="canvas-scroll-container">
       
       <!-- Sidebar (Pitches) -->
       <div id="sidebar-pitches" class="sticky left-0 z-20 w-10 md:w-16 bg-white border-r-2 border-gray-100 shadow-[2px_0_5px_rgba(0,0,0,0.05)] flex flex-col shrink-0">
@@ -117,6 +166,7 @@ button:hover{ filter:brightness(.95) }</style></head>
           
           <!-- Notes Container -->
           <div id="notes-container" class="absolute inset-0 pointer-events-none z-10"></div>
+          <div id="selection-box" class="absolute border-2 border-sky-500 bg-sky-300/20 rounded-md pointer-events-none hidden z-30"></div>
         </div>
 
         <!-- Add Measure Button -->
@@ -127,6 +177,7 @@ button:hover{ filter:brightness(.95) }</style></head>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
 
@@ -152,6 +203,9 @@ button:hover{ filter:brightness(.95) }</style></head>
         </div>
 
         <div class="flex flex-wrap justify-center items-center gap-2 w-full lg:w-auto">
+          <button id="btn-delete-selected" class="hidden flex items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-3 bg-amber-50 text-amber-600 font-bold rounded-xl md:rounded-2xl hover:bg-amber-100 transition-colors">
+            <i data-lucide="scissors" class="w-3.5 h-3.5 md:w-4 md:h-4"></i><span class="text-xs md:text-sm" data-i18n="deleteSelected">선택 삭제</span>
+          </button>
           <button id="btn-clear" class="flex items-center gap-1 md:gap-1.5 px-3 py-2 md:px-4 md:py-3 bg-red-50 text-red-500 font-bold rounded-xl md:rounded-2xl hover:bg-red-100 transition-colors">
             <i data-lucide="trash-2" class="w-3.5 h-3.5 md:w-4 md:h-4"></i><span class="text-xs md:text-sm hidden sm:inline" data-i18n="clearAll">초기화</span>
           </button>
@@ -167,9 +221,14 @@ button:hover{ filter:brightness(.95) }</style></head>
           <button id="btn-help" class="flex items-center justify-center p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors" title="사용법 보기">
             <i data-lucide="help-circle" class="w-4 h-4 md:w-5 md:h-5"></i>
           </button>
-          <button id="btn-lang" class="flex items-center gap-1 md:gap-1.5 p-2.5 md:px-3 md:py-3 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl hover:bg-gray-100 transition-colors">
-            <i data-lucide="globe" class="w-4 h-4"></i><span class="text-xs md:text-sm hidden md:inline" data-i18n="langToggle">English</span>
-          </button>
+          <div class="flex items-center gap-1.5 px-2.5 py-2 md:px-3 md:py-2.5 bg-gray-50 text-gray-500 font-bold rounded-xl md:rounded-2xl border border-gray-100">
+            <i data-lucide="globe" class="w-4 h-4 shrink-0"></i>
+            <select id="lang-select" class="bg-transparent text-xs md:text-sm font-bold outline-none cursor-pointer pr-1">
+              <option value="ko">한국어</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -183,6 +242,11 @@ button:hover{ filter:brightness(.95) }</style></head>
   <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg text-sm md:text-base font-bold transition-all duration-300 transform scale-0 opacity-0 z-50 whitespace-nowrap pointer-events-none">
     메시지
   </div>
+
+  <div id="note-context-menu" class="fixed z-[60] hidden min-w-[140px] bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl p-1.5">
+    <button id="menu-duplicate" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-sm font-semibold text-slate-700" data-i18n="duplicate">복제</button>
+    <button id="menu-delete" class="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-50 text-sm font-semibold text-rose-600" data-i18n="delete">삭제</button>
+  </div>
   
   <!-- Help Modal -->
   <div id="modal-help" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
@@ -194,6 +258,10 @@ button:hover{ filter:brightness(.95) }</style></head>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">↔️</span> <span data-i18n="help2">길게 늘리기...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎹</span> <span data-i18n="help3">악기 바꾸기...</span></p>
         <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🎙️</span> <span data-i18n="help4">내 소리 녹음...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🌐</span> <span data-i18n="help5">언어 변경...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🖱️</span> <span data-i18n="help6">Shift 드래그...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🧹</span> <span data-i18n="help7">선택 삭제...</span></p>
+        <p class="flex items-start gap-3"><span class="text-xl md:text-2xl">🧭</span> <span data-i18n="help8">오른쪽 클릭 메뉴...</span></p>
       </div>
       <div class="mt-6 md:mt-8 text-center">
         <button id="btn-ok-help" class="bg-sky-500 text-white px-6 py-2.5 md:px-8 md:py-3 rounded-xl md:rounded-2xl font-bold text-base md:text-lg hover:bg-sky-400 transition-colors shadow-md w-full sm:w-auto" data-i18n="helpBtn">네, 알겠어요!</button>
@@ -206,8 +274,8 @@ button:hover{ filter:brightness(.95) }</style></head>
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl p-6 relative flex flex-col items-center min-w-[300px] transform scale-95 transition-transform duration-300" id="modal-confirm-content">
       <h3 class="text-lg md:text-xl font-bold mb-6 text-gray-800" id="confirm-msg">모든 음표를 지우시겠습니까?</h3>
       <div class="flex gap-4 w-full justify-center">
-        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto" id="btn-cancel-text">취소</button>
-        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto" id="btn-confirm-text">확인</button>
+        <button id="btn-cancel-clear" class="px-6 py-2.5 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition-colors w-full sm:w-auto">취소</button>
+        <button id="btn-ok-clear" class="px-6 py-2.5 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors w-full sm:w-auto">확인</button>
       </div>
     </div>
   </div>
@@ -222,12 +290,18 @@ button:hover{ filter:brightness(.95) }</style></head>
         help2: '길게 늘리기: 블록 오른쪽 끝의 흰색 부분을 잡고 옆으로 당기면 소리가 길어져요.',
         help3: '악기 바꾸기: 화면 아래쪽의 메뉴를 눌러 다양한 악기 소리를 골라보세요.',
         help4: "내 소리 녹음: 악기를 '내 소리'로 바꾸고 🔴 버튼을 눌러보세요. 강아지 소리, 목소리 등을 녹음하면 나만의 악기가 됩니다!",
+        help5: '언어 변경: 하단 우측의 언어 선택 드롭다운에서 한국어/English/日本語를 바로 바꿀 수 있어요.',
+        help6: '여러 블록 선택: Shift 키를 누른 채 드래그해서 여러 블록을 고른 뒤, 핸들을 드래그하면 길이를 한 번에 늘리거나 줄일 수 있어요.',
+        help7: '선택 삭제: 여러 블록을 선택한 뒤 [선택 삭제] 버튼 또는 키보드 Delete/Backspace로 한 번에 지울 수 있어요.',
+        help8: '오른쪽 클릭 메뉴: 블록을 오른쪽 클릭하면 복제/삭제를 빠르게 실행할 수 있어요.',
         helpBtn: '네, 알겠어요!', recordNew: '새 소리 녹음', recordStop: '정지 (녹음 중...)', recordRetry: '다시 녹음 (최대 3초)',
         toastNoNote: '음표를 먼저 찍어주세요! 🎵', toastMixing: '음원 믹싱 중... (약 10초 정도 소요됩니다) 🎧', toastDone: '다운로드 완료! 🎉', toastFail: '다운로드 실패: ',
         toastShareMic: "링크 복사 완료! ('내 소리'는 피아노로 변경되어 공유됩니다) 🔗", toastShare: '링크가 복사되었습니다! 친구에게 공유해보세요 🔗',
         toastShareFail: '링크 복사에 실패했습니다.', toastRecDone: '🎤 녹음 완료! 블록 길이를 늘리면 소리가 반복됩니다.', toastMicErr: '마이크 접근 권한이 필요합니다! 🎙️',
-        langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도'],
-        chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
+        deleteSelected: '선택 삭제', toastDeletedSelected: '선택한 블록을 삭제했어요. 🧹',
+        duplicate: '복제', delete: '삭제', duplicateSelected: '선택 복제', deleteSelectedMenu: '선택 삭제', toastDuplicated: '블록을 복제했어요. ✨',
+        langToggle: 'English', pitchLabels: ['도', '시', '라', '솔', '파', '미', '레', '도', '시', '라', '솔', '파', '미', '레', '도'],
+        chromaticLabels: ['도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도', '시', '라#', '라', '솔#', '솔', '파#', '파', '미', '레#', '레', '도#', '도'],
         instNames: { piano: '그랜드 피아노', marimba: '마림바', strings: '클래식 현악기', pluck: '어쿠스틱 기타', synth: '레트로 신디사이저', drum: '전자 드럼', mic: '내 소리' },
         createdBy: 'Created by. 교육뮤지컬 꿈꾸는 치수쌤', confirmClear: '모든 음표를 지우시겠습니까?', cancel: '취소', confirm: '확인'
       },
@@ -238,14 +312,42 @@ button:hover{ filter:brightness(.95) }</style></head>
         help2: 'Extend Length: Drag the white handle on the right of a block to make it longer.',
         help3: 'Change Instruments: Use the menu at the bottom to choose different sounds.',
         help4: "Record Sound: Change instrument to 'My Sound' and press 🔴. Record anything to make your own instrument!",
+        help5: 'Language: Use the language dropdown at the bottom right to switch 한국어 / English / 日本語 instantly.',
+        help6: 'Multi-select blocks: Hold Shift and drag to select many blocks, then drag one resize handle to resize all selected blocks together.',
+        help7: 'Delete selected: after selecting multiple blocks, use [Delete Selected] or press Delete/Backspace to remove them at once.',
+        help8: 'Right-click menu: right-click a block to quickly duplicate or delete.',
         helpBtn: 'Got it!', recordNew: 'Record Sound', recordStop: 'Stop (Recording...)', recordRetry: 'Record Again (Max 3s)',
         toastNoNote: 'Please add some notes first! 🎵', toastMixing: 'Mixing audio... (Takes about 10 seconds) 🎧', toastDone: 'Download complete! 🎉', toastFail: 'Download failed: ',
         toastShareMic: "Link copied! ('My Sound' will be shared as a piano) 🔗", toastShare: 'Link copied! Share it with your friends 🔗',
         toastShareFail: 'Failed to copy link.', toastRecDone: '🎤 Recording complete! Extend blocks to loop the sound.', toastMicErr: 'Microphone access is required! 🎙️',
-        langToggle: '한국어', pitchLabels: ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
-        chromaticLabels: ['C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
+        deleteSelected: 'Delete Selected', toastDeletedSelected: 'Selected blocks deleted. 🧹',
+        duplicate: 'Duplicate', delete: 'Delete', duplicateSelected: 'Duplicate Selected', deleteSelectedMenu: 'Delete Selected', toastDuplicated: 'Block(s) duplicated. ✨',
+        langToggle: '한국어', pitchLabels: ['C6', 'B5', 'A5', 'G5', 'F5', 'E5', 'D5', 'C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'],
+        chromaticLabels: ['C6', 'B5', 'A#5', 'A5', 'G#5', 'G5', 'F#5', 'F5', 'E5', 'D#5', 'D5', 'C#5', 'C5', 'B4', 'A#4', 'A4', 'G#4', 'G4', 'F#4', 'F4', 'E4', 'D#4', 'D4', 'C#4', 'C4'],
         instNames: { piano: 'Grand Piano', marimba: 'Marimba', strings: 'Classic Strings', pluck: 'Acoustic Guitar', synth: 'Retro Synth', drum: 'Electronic Drum', mic: 'My Sound' },
         createdBy: 'Created by. Chisoo', confirmClear: 'Clear all notes?', cancel: 'Cancel', confirm: 'Confirm'
+      },
+      ja: {
+        title: 'せかいのすべての音', slow: 'ゆっくり', fast: 'はやく', download: '音声を保存', downloading: '保存中...', share: 'リンク共有', clearAll: 'リセット',
+        chordGuide: '和音ガイド', extendedMode: '拡張モード', addMeasure: '小節を追加', helpTitle: '✨ つかいかた ✨',
+        help1: '音を置く: 空いているマスをタップ(クリック)またはドラッグして音ブロックを作れます。',
+        help2: '長さをのばす: ブロック右端の白い部分をドラッグすると音が長くなります。',
+        help3: '楽器を変更: 下のメニューからいろいろな楽器の音を選べます。',
+        help4: "マイサウンド録音: 楽器を『マイサウンド』にして🔴を押してください。声や音を録音すると自分だけの楽器になります！",
+        help5: '言語変更: 右下の言語ドロップダウンで 한국어 / English / 日本語 をすぐ切り替えられます。',
+        help6: '複数選択: Shiftキーを押しながらドラッグで複数ブロックを選び、ハンドルを動かすとまとめて長さを変更できます。',
+        help7: '選択削除: 複数ブロックを選んでから［選択削除］ボタン、または Delete/Backspace で一度に削除できます。',
+        help8: '右クリックメニュー: ブロックを右クリックすると複製/削除をすばやく実行できます。',
+        helpBtn: 'わかった！', recordNew: '新しい音を録音', recordStop: '停止 (録音中...)', recordRetry: 'もう一度録音 (最大3秒)',
+        toastNoNote: '先に音符を置いてください！🎵', toastMixing: '音声をミックス中...（約10秒）🎧', toastDone: 'ダウンロード完了！🎉', toastFail: 'ダウンロード失敗: ',
+        toastShareMic: "リンクをコピーしました！（『マイサウンド』はピアノとして共有されます）🔗", toastShare: 'リンクをコピーしました！お友だちにシェアしよう 🔗',
+        toastShareFail: 'リンクのコピーに失敗しました。', toastRecDone: '🎤 録音が完了しました！ブロックを伸ばすと音が繰り返されます。', toastMicErr: 'マイクへのアクセス許可が必要です！🎙️',
+        deleteSelected: '選択削除', toastDeletedSelected: '選択したブロックを削除しました。🧹',
+        duplicate: '複製', delete: '削除', duplicateSelected: '選択を複製', deleteSelectedMenu: '選択を削除', toastDuplicated: 'ブロックを複製しました。✨',
+        langToggle: '한국어', pitchLabels: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
+        chromaticLabels: ['ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド', 'シ', 'ラ#', 'ラ', 'ソ#', 'ソ', 'ファ#', 'ファ', 'ミ', 'レ#', 'レ', 'ド#', 'ド'],
+        instNames: { piano: 'グランドピアノ', marimba: 'マリンバ', strings: 'クラシックストリングス', pluck: 'アコースティックギター', synth: 'レトロシンセ', drum: '電子ドラム', mic: 'マイサウンド' },
+        createdBy: 'Created by. Chisoo', confirmClear: 'すべての音符を消しますか？', cancel: 'キャンセル', confirm: '確認'
       }
     };
 
@@ -271,7 +373,10 @@ button:hover{ filter:brightness(.95) }</style></head>
       isExporting: false,
       isToneStarted: false,
       isDrawing: false,
-      resizing: null // { id, startX, originalDuration, colWidth }
+      resizing: null, // { ids, startX, originalDurations, colWidth }
+      selectedNoteIds: [],
+      selectionDrag: null, // { startX, startY, currentX, currentY, colWidth, rowHeight }
+      contextMenu: { visible: false, x: 0, y: 0, targetId: null }
     };
 
     let synth = null;
@@ -284,56 +389,94 @@ button:hover{ filter:brightness(.95) }</style></head>
 
     // --- Audio Setup ---
     const createSynth = (inst) => {
-      const vol = new Tone.Volume(-8).toDestination();
+      const vol = new Tone.Volume(-10).toDestination();
       switch (inst) {
-        case 'marimba': return new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3.01, modulationIndex: 10, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 } }).connect(vol);
-        case 'strings': return new Tone.PolySynth(Tone.AMSynth, { harmonicity: 1, oscillator: { type: 'sawtooth' }, envelope: { attack: 0.1, decay: 0.1, sustain: 1, release: 1.2 } }).connect(vol);
-        case 'pluck': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }).connect(vol);
-        case 'synth': return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fatsawtooth', count: 3, spread: 30 }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.4, release: 0.5 } }).connect(vol);
-        case 'drum': return new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.05, octaves: 4, oscillator: { type: 'sine' }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4, attackCurve: 'exponential' } }).connect(vol);
-        case 'piano': default: return new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'amsine' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 1.2 } }).connect(vol);
+        case 'marimba':
+          return new Tone.PolySynth(Tone.FMSynth, {
+            harmonicity: 3.4, modulationIndex: 12,
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.22, sustain: 0.0, release: 0.2 }
+          }).connect(vol);
+        case 'strings':
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sawtooth' },
+            envelope: { attack: 0.18, decay: 0.25, sustain: 0.8, release: 1.8 }
+          }).connect(vol);
+        case 'pluck':
+          return new Tone.PolySynth(Tone.PluckSynth, {
+            attackNoise: 1.2,
+            dampening: 2800,
+            resonance: 0.9
+          }).connect(vol);
+        case 'synth':
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'fatsawtooth', count: 3, spread: 24 },
+            envelope: { attack: 0.01, decay: 0.18, sustain: 0.45, release: 0.55 }
+          }).connect(vol);
+        case 'drum':
+          return new Tone.PolySynth(Tone.MembraneSynth, {
+            pitchDecay: 0.03,
+            octaves: 2,
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.24, sustain: 0.01, release: 0.32, attackCurve: 'exponential' }
+          }).connect(vol);
+        case 'piano':
+        default:
+          return new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.008, decay: 0.35, sustain: 0.25, release: 1.0 }
+          }).connect(vol);
       }
     };
 
+    const DIATONIC_BASE = [
+      ['C6', 84, 'bg-pink-500', 'hover:bg-pink-400'], ['B5', 83, 'bg-purple-500', 'hover:bg-purple-400'],
+      ['A5', 81, 'bg-blue-500', 'hover:bg-blue-400'], ['G5', 79, 'bg-teal-500', 'hover:bg-teal-400'],
+      ['F5', 77, 'bg-green-500', 'hover:bg-green-400'], ['E5', 76, 'bg-yellow-400', 'hover:bg-yellow-300'],
+      ['D5', 74, 'bg-orange-400', 'hover:bg-orange-300'], ['C5', 72, 'bg-red-500', 'hover:bg-red-400'],
+      ['B4', 71, 'bg-purple-500', 'hover:bg-purple-400'], ['A4', 69, 'bg-blue-500', 'hover:bg-blue-400'],
+      ['G4', 67, 'bg-teal-500', 'hover:bg-teal-400'], ['F4', 65, 'bg-green-500', 'hover:bg-green-400'],
+      ['E4', 64, 'bg-yellow-400', 'hover:bg-yellow-300'], ['D4', 62, 'bg-orange-400', 'hover:bg-orange-300'],
+      ['C4', 60, 'bg-red-500', 'hover:bg-red-400'],
+    ];
+
+    const CHROMATIC_BASE = [
+      ['C6', 84], ['B5', 83], ['A#5', 82], ['A5', 81], ['G#5', 80], ['G5', 79], ['F#5', 78], ['F5', 77], ['E5', 76], ['D#5', 75], ['D5', 74], ['C#5', 73], ['C5', 72],
+      ['B4', 71], ['A#4', 70], ['A4', 69], ['G#4', 68], ['G4', 67], ['F#4', 66], ['F4', 65], ['E4', 64], ['D#4', 63], ['D4', 62], ['C#4', 61], ['C4', 60],
+    ];
+
+    const getDiatonicPitches = (lang = state.lang) => {
+      const labels = translations[lang].pitchLabels;
+      return DIATONIC_BASE.map(([id, midi, color, hover], idx) => ({ id, midi, color, hover, label: labels[idx] || id }));
+    };
+
+    const getChromaticPitches = (lang = state.lang) => {
+      const labels = translations[lang].chromaticLabels;
+      return CHROMATIC_BASE.map(([id, midi], idx) => ({
+        id,
+        midi,
+        color: id.includes('#') ? 'bg-slate-700' : DIATONIC_BASE.find(d => d[0] === id)?.[2] || 'bg-pink-500',
+        hover: id.includes('#') ? 'hover:bg-slate-600' : DIATONIC_BASE.find(d => d[0] === id)?.[3] || 'hover:bg-pink-400',
+        label: labels[idx] || id
+      }));
+    };
+
     const updatePitches = () => {
-      const tLang = translations[state.lang];
-      if (state.isExtended) {
-        PITCHES = [
-          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.chromaticLabels[0] },
-          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.chromaticLabels[1] },
-          { id: 'A#4', midi: 70, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[2] },
-          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.chromaticLabels[3] },
-          { id: 'G#4', midi: 68, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[4] },
-          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.chromaticLabels[5] },
-          { id: 'F#4', midi: 66, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[6] },
-          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.chromaticLabels[7] },
-          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.chromaticLabels[8] },
-          { id: 'D#4', midi: 63, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[9] },
-          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.chromaticLabels[10] },
-          { id: 'C#4', midi: 61, color: 'bg-slate-700', hover: 'hover:bg-slate-600', label: tLang.chromaticLabels[11] },
-          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.chromaticLabels[12] },
-        ];
-      } else {
-        PITCHES = [
-          { id: 'C5', midi: 72, color: 'bg-pink-500', hover: 'hover:bg-pink-400', label: tLang.pitchLabels[0] },
-          { id: 'B4', midi: 71, color: 'bg-purple-500', hover: 'hover:bg-purple-400', label: tLang.pitchLabels[1] },
-          { id: 'A4', midi: 69, color: 'bg-blue-500', hover: 'hover:bg-blue-400', label: tLang.pitchLabels[2] },
-          { id: 'G4', midi: 67, color: 'bg-teal-500', hover: 'hover:bg-teal-400', label: tLang.pitchLabels[3] },
-          { id: 'F4', midi: 65, color: 'bg-green-500', hover: 'hover:bg-green-400', label: tLang.pitchLabels[4] },
-          { id: 'E4', midi: 64, color: 'bg-yellow-400', hover: 'hover:bg-yellow-300', label: tLang.pitchLabels[5] },
-          { id: 'D4', midi: 62, color: 'bg-orange-400', hover: 'hover:bg-orange-300', label: tLang.pitchLabels[6] },
-          { id: 'C4', midi: 60, color: 'bg-red-500', hover: 'hover:bg-red-400', label: tLang.pitchLabels[7] },
-        ];
-      }
+      PITCHES = state.isExtended ? getChromaticPitches(state.lang) : getDiatonicPitches(state.lang);
     };
 
     // --- DOM Elements ---
     const els = {
+      canvasContainer: document.getElementById('canvas-scroll-container'),
       sidebar: document.getElementById('sidebar-pitches'),
       gridArea: document.getElementById('grid-area'),
       gridRows: document.getElementById('grid-rows'),
       gridCols: document.getElementById('grid-cols'),
       notesContainer: document.getElementById('notes-container'),
+      selectionBox: document.getElementById('selection-box'),
+      contextMenu: document.getElementById('note-context-menu'),
+      menuDuplicate: document.getElementById('menu-duplicate'),
+      menuDelete: document.getElementById('menu-delete'),
       playhead: document.getElementById('playhead'),
       instrumentSelect: document.getElementById('instrument-select'),
       btnRecord: document.getElementById('btn-record'),
@@ -347,10 +490,11 @@ button:hover{ filter:brightness(.95) }</style></head>
       btnChordGuide: document.getElementById('btn-chord-guide'),
       btnExtended: document.getElementById('btn-extended'),
       btnAddMeasure: document.getElementById('btn-add-measure'),
+      btnDeleteSelected: document.getElementById('btn-delete-selected'),
       btnClear: document.getElementById('btn-clear'),
       btnDownload: document.getElementById('btn-download'),
       btnShare: document.getElementById('btn-share'),
-      btnLang: document.getElementById('btn-lang'),
+      langSelect: document.getElementById('lang-select'),
       btnHelp: document.getElementById('btn-help'),
       modalHelp: document.getElementById('modal-help'),
       modalConfirm: document.getElementById('modal-confirm'),
@@ -377,6 +521,94 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.playhead.style.left = `${(state.currentStep / state.totalSteps) * 100}%`;
     };
 
+    const clearSelection = () => {
+      if (state.selectedNoteIds.length === 0) return;
+      state.selectedNoteIds = [];
+      renderNotes();
+    };
+
+    const hideContextMenu = () => {
+      state.contextMenu = { visible: false, x: 0, y: 0, targetId: null };
+      els.contextMenu.classList.add('hidden');
+    };
+
+    const getContextTargetIds = () => {
+      if (!state.contextMenu.targetId) return [];
+      if (state.selectedNoteIds.includes(state.contextMenu.targetId) && state.selectedNoteIds.length > 1) return [...state.selectedNoteIds];
+      return [state.contextMenu.targetId];
+    };
+
+    const duplicateNotes = (noteIds) => {
+      if (!noteIds.length) return;
+      const originals = state.notes.filter(n => noteIds.includes(n.id));
+      if (!originals.length) return;
+      const maxStep = Math.max(...originals.map(n => n.step + n.duration));
+      const shift = maxStep < state.totalSteps ? 1 : 0;
+      const clones = originals.map(n => ({ ...n, id: `${Date.now()}-${Math.random()}`, step: Math.min(state.totalSteps - n.duration, n.step + shift) }));
+      state.notes = [...state.notes, ...clones];
+      state.selectedNoteIds = clones.map(n => n.id);
+      renderNotes();
+      updateControlsUI();
+      showToast(translations[state.lang].toastDuplicated);
+    };
+
+    const showContextMenu = (x, y, targetId) => {
+      const tLang = translations[state.lang];
+      state.contextMenu = { visible: true, x, y, targetId };
+      const useSelected = state.selectedNoteIds.includes(targetId) && state.selectedNoteIds.length > 1;
+      els.menuDuplicate.textContent = useSelected ? tLang.duplicateSelected : tLang.duplicate;
+      els.menuDelete.textContent = useSelected ? tLang.deleteSelectedMenu : tLang.delete;
+      const menuWidth = 160;
+      const menuHeight = 96;
+      const left = Math.min(x, window.innerWidth - menuWidth - 12);
+      const top = Math.min(y, window.innerHeight - menuHeight - 12);
+      Object.assign(els.contextMenu.style, { left: `${left}px`, top: `${top}px` });
+      els.contextMenu.classList.remove('hidden');
+    };
+
+    const deleteSelectedNotes = () => {
+      if (state.selectedNoteIds.length === 0) return;
+      const selectedSet = new Set(state.selectedNoteIds);
+      state.notes = state.notes.filter(note => !selectedSet.has(note.id));
+      state.selectedNoteIds = [];
+      renderNotes();
+      updateControlsUI();
+      showToast(translations[state.lang].toastDeletedSelected);
+    };
+
+    const updateSelectionBoxUI = () => {
+      if (!state.selectionDrag) {
+        els.selectionBox.classList.add('hidden');
+        return;
+      }
+      const left = Math.min(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const top = Math.min(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const width = Math.abs(state.selectionDrag.currentX - state.selectionDrag.startX);
+      const height = Math.abs(state.selectionDrag.currentY - state.selectionDrag.startY);
+      Object.assign(els.selectionBox.style, { left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
+      els.selectionBox.classList.remove('hidden');
+    };
+
+    const updateSelectedNotesByDragRect = () => {
+      if (!state.selectionDrag) return;
+      const x1 = Math.min(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const x2 = Math.max(state.selectionDrag.startX, state.selectionDrag.currentX);
+      const y1 = Math.min(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const y2 = Math.max(state.selectionDrag.startY, state.selectionDrag.currentY);
+      const ids = state.notes.filter(note => {
+        const pitchIndex = PITCHES.findIndex(p => p.id === note.pitchId);
+        if (pitchIndex < 0) return false;
+        const noteX1 = note.step * state.selectionDrag.colWidth;
+        const noteX2 = (note.step + note.duration) * state.selectionDrag.colWidth;
+        const noteY1 = pitchIndex * state.selectionDrag.rowHeight;
+        const noteY2 = noteY1 + state.selectionDrag.rowHeight;
+        const intersects = noteX1 < x2 && noteX2 > x1 && noteY1 < y2 && noteY2 > y1;
+        return intersects;
+      }).map(n => n.id);
+      state.selectedNoteIds = ids;
+      renderNotes();
+    };
+
     const applyTranslations = () => {
       const tLang = translations[state.lang];
       document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -391,6 +623,7 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.confirmMsg.textContent = tLang.confirmClear;
       els.btnCancelClear.textContent = tLang.cancel;
       els.btnOkClear.textContent = tLang.confirm;
+      els.langSelect.value = state.lang;
       
       if(state.isRecording) els.recordText.textContent = tLang.recordStop;
       else if(state.recordedUrl) els.recordText.textContent = tLang.recordRetry;
@@ -407,8 +640,21 @@ button:hover{ filter:brightness(.95) }</style></head>
       els.gridRows.innerHTML = '';
       els.gridCols.innerHTML = '';
 
-      // 완벽한 정사각형 블록을 위해 캔버스 영역 및 행 높이를 명시적 픽셀로 고정
-      const cellSize = window.innerWidth < 768 ? 40 : 48; // 모바일 40px, PC 48px
+      // 화면 크기에 따라 기본 32스텝이 보기 좋게 들어오도록 셀 크기 자동 조정
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth < 1024;
+      const manyRows = PITCHES.length > 16;
+      const minCell = manyRows ? (isMobile ? 14 : isTablet ? 16 : 18) : (isMobile ? 26 : isTablet ? 34 : 42);
+      const maxCell = manyRows ? (isMobile ? 24 : isTablet ? 30 : 36) : (isMobile ? 42 : isTablet ? 56 : 88);
+      const containerRect = els.canvasContainer.getBoundingClientRect();
+      const availableWidth = containerRect.width - (isMobile ? 54 : 82);
+      const availableHeight = containerRect.height - (isMobile ? 12 : 16);
+      const targetSteps = Math.min(state.totalSteps, 32);
+      const targetRows = PITCHES.length || 8;
+      const fittedCell = Math.floor(availableWidth / targetSteps);
+      const fittedCellByHeight = Math.floor(availableHeight / targetRows);
+      const fitCell = Math.min(fittedCell || maxCell, fittedCellByHeight || maxCell);
+      const cellSize = Math.max(minCell, Math.min(maxCell, fitCell));
       els.gridArea.style.width = `${state.totalSteps * cellSize}px`;
       els.gridArea.style.height = `${PITCHES.length * cellSize}px`;
       
@@ -458,7 +704,8 @@ button:hover{ filter:brightness(.95) }</style></head>
         const heightPercent = 100 / PITCHES.length;
 
         const noteDiv = document.createElement('div');
-        noteDiv.className = `note-block absolute rounded-md shadow-sm border border-black/10 flex group ${pitch.color} hover:brightness-110 transition-colors duration-200 z-10 pointer-events-auto cursor-pointer`;
+        const isSelected = state.selectedNoteIds.includes(note.id);
+        noteDiv.className = `note-block absolute rounded-md shadow-sm border border-black/10 flex group ${pitch.color} hover:brightness-110 transition-colors duration-200 z-10 pointer-events-auto cursor-pointer ${isSelected ? 'selected' : ''}`;
         noteDiv.style.left = `${leftPercent}%`;
         noteDiv.style.top = `${topPercent}%`;
         noteDiv.style.width = `calc(${widthPercent}% - 2px)`;
@@ -477,9 +724,25 @@ button:hover{ filter:brightness(.95) }</style></head>
         noteDiv.addEventListener('pointerdown', (e) => {
           if(e.target.closest('.resize-handle')) return;
           e.stopPropagation();
+          if (e.shiftKey) {
+            if (state.selectedNoteIds.includes(note.id)) state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== note.id);
+            else state.selectedNoteIds = [...state.selectedNoteIds, note.id];
+            renderNotes();
+            return;
+          }
           if(state.isDrawing || state.resizing) return;
-          state.notes = state.notes.filter(n => n.id !== note.id);
+          state.selectedNoteIds = [note.id];
           renderNotes();
+        });
+
+        noteDiv.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!state.selectedNoteIds.includes(note.id)) {
+            state.selectedNoteIds = [note.id];
+            renderNotes();
+          }
+          showContextMenu(e.clientX, e.clientY, note.id);
         });
 
         // Note Resize
@@ -489,11 +752,18 @@ button:hover{ filter:brightness(.95) }</style></head>
           state.isDrawing = false;
           const rect = els.gridArea.getBoundingClientRect();
           const colWidth = rect.width / state.totalSteps;
-          state.resizing = { id: note.id, startX: e.clientX, originalDuration: note.duration, colWidth };
+          const idsToResize = state.selectedNoteIds.includes(note.id) && state.selectedNoteIds.length > 1 ? [...state.selectedNoteIds] : [note.id];
+          const originalDurations = {};
+          state.notes.forEach(n => { if (idsToResize.includes(n.id)) originalDurations[n.id] = n.duration; });
+          state.resizing = { ids: idsToResize, startX: e.clientX, originalDurations, colWidth };
         });
 
         els.notesContainer.appendChild(noteDiv);
       });
+      if (els.btnDeleteSelected) {
+        if (state.selectedNoteIds.length > 0) els.btnDeleteSelected.classList.remove('hidden');
+        else els.btnDeleteSelected.classList.add('hidden');
+      }
     };
 
     const updateControlsUI = () => {
@@ -547,6 +817,9 @@ button:hover{ filter:brightness(.95) }</style></head>
       // Mic visibility
       if(state.instrument === 'mic') els.btnRecord.classList.remove('hidden');
       else els.btnRecord.classList.add('hidden');
+
+      if (state.selectedNoteIds.length > 0) els.btnDeleteSelected.classList.remove('hidden');
+      else els.btnDeleteSelected.classList.add('hidden');
     };
 
     // --- Audio Logic ---
@@ -649,8 +922,19 @@ button:hover{ filter:brightness(.95) }</style></head>
     };
 
     els.gridArea.addEventListener('pointerdown', async (e) => {
+      hideContextMenu();
       if (!state.isToneStarted) { await Tone.start(); state.isToneStarted = true; }
       if (e.target.closest('.note-block') || state.resizing) return;
+      if (e.shiftKey) {
+        const rect = els.gridArea.getBoundingClientRect();
+        const colWidth = rect.width / state.totalSteps;
+        const rowHeight = rect.height / PITCHES.length;
+        state.selectionDrag = { startX: e.clientX - rect.left, startY: e.clientY - rect.top, currentX: e.clientX - rect.left, currentY: e.clientY - rect.top, colWidth, rowHeight };
+        updateSelectionBoxUI();
+        updateSelectedNotesByDragRect();
+        return;
+      }
+      if (state.selectedNoteIds.length) clearSelection();
       state.isDrawing = true;
       els.gridArea.releasePointerCapture(e.pointerId);
       processPointerEvent(e);
@@ -674,6 +958,14 @@ button:hover{ filter:brightness(.95) }</style></head>
         return;
       }
 
+      if (state.selectionDrag) {
+        state.selectionDrag.currentX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        state.selectionDrag.currentY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+        updateSelectionBoxUI();
+        updateSelectedNotesByDragRect();
+        return;
+      }
+
       if (!state.isDrawing || state.resizing) return;
       processPointerEvent(e);
     });
@@ -686,35 +978,83 @@ button:hover{ filter:brightness(.95) }</style></head>
       if (!state.resizing) return;
       const dx = e.clientX - state.resizing.startX;
       const deltaSteps = Math.round(dx / state.resizing.colWidth);
-      let newDuration = Math.max(1, state.resizing.originalDuration + deltaSteps); 
-      
       state.notes = state.notes.map(note => {
-        if (note.id === state.resizing.id) return { ...note, duration: Math.min(newDuration, state.totalSteps - note.step) };
-        return note;
+        if (!state.resizing.ids.includes(note.id)) return note;
+        const originalDuration = state.resizing.originalDurations[note.id] || note.duration;
+        const newDuration = Math.max(1, originalDuration + deltaSteps);
+        return { ...note, duration: Math.min(newDuration, state.totalSteps - note.step) };
       });
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => state.notes.some(note => note.id === id));
       renderNotes();
     });
 
     window.addEventListener('pointerup', () => {
       state.isDrawing = false;
       state.hoveredMidi = null;
+      if(state.selectionDrag) {
+        state.selectionDrag = null;
+        updateSelectionBoxUI();
+      }
       if(state.resizing) { state.resizing = null; renderGrid(); }
     });
     window.addEventListener('pointercancel', () => {
       state.isDrawing = false;
       state.hoveredMidi = null;
+      if(state.selectionDrag) {
+        state.selectionDrag = null;
+        updateSelectionBoxUI();
+      }
       if(state.resizing) { state.resizing = null; renderGrid(); }
+    });
+
+    els.gridArea.addEventListener('dblclick', (e) => {
+      const noteEl = e.target.closest('.note-block');
+      if (!noteEl || state.resizing) return;
+      const rect = els.gridArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const colWidth = rect.width / state.totalSteps;
+      const rowHeight = rect.height / PITCHES.length;
+      const step = Math.floor(x / colWidth);
+      const pitchIndex = Math.floor(y / rowHeight);
+      if (pitchIndex < 0 || pitchIndex >= PITCHES.length) return;
+      const pitchId = PITCHES[pitchIndex].id;
+      const target = state.notes.find(n => n.step === step && n.pitchId === pitchId);
+      if (!target) return;
+      state.notes = state.notes.filter(n => n.id !== target.id);
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== target.id);
+      renderNotes();
     });
 
     // --- Actions ---
     els.btnChordGuide.addEventListener('click', () => { state.showChordGuide = !state.showChordGuide; updateControlsUI(); renderGrid(); });
     els.btnExtended.addEventListener('click', () => {
       if(state.isExtended) state.notes = state.notes.map(n => ({ ...n, pitchId: n.pitchId.replace('#', '') }));
+      state.selectedNoteIds = state.selectedNoteIds.filter(id => state.notes.some(n => n.id === id));
       state.isExtended = !state.isExtended;
       updatePitches(); updateControlsUI(); renderGrid(); renderNotes();
     });
     els.btnPlay.addEventListener('click', togglePlayback);
     els.btnStop.addEventListener('click', stopPlayback);
+    els.btnDeleteSelected.addEventListener('click', deleteSelectedNotes);
+    els.menuDuplicate.addEventListener('click', () => {
+      const ids = getContextTargetIds();
+      duplicateNotes(ids);
+      hideContextMenu();
+    });
+    els.menuDelete.addEventListener('click', () => {
+      const ids = getContextTargetIds();
+      if (!ids.length) return;
+      if (ids.length === 1) {
+        state.notes = state.notes.filter(n => n.id !== ids[0]);
+        state.selectedNoteIds = state.selectedNoteIds.filter(id => id !== ids[0]);
+        renderNotes();
+      } else {
+        state.selectedNoteIds = ids;
+        deleteSelectedNotes();
+      }
+      hideContextMenu();
+    });
     els.bpmSlider.addEventListener('input', (e) => { state.bpm = Number(e.target.value); els.bpmDisplay.textContent = `${state.bpm} BPM`; if(state.isPlaying){ stopPlayback(); togglePlayback(); } });
     els.instrumentSelect.addEventListener('change', (e) => {
       state.instrument = e.target.value;
@@ -736,7 +1076,7 @@ button:hover{ filter:brightness(.95) }</style></head>
       setTimeout(()=> els.modalConfirm.classList.add('hidden'), 300);
     });
     els.btnOkClear.addEventListener('click', () => {
-      state.notes = []; stopPlayback(); renderNotes();
+      state.notes = []; state.selectedNoteIds = []; stopPlayback(); renderNotes();
       els.btnCancelClear.click();
     });
     
@@ -753,10 +1093,27 @@ button:hover{ filter:brightness(.95) }</style></head>
     els.btnOkHelp.addEventListener('click', closeHelp);
     els.btnCloseHelp.addEventListener('click', closeHelp);
 
-    els.btnLang.addEventListener('click', () => {
-      state.lang = state.lang === 'ko' ? 'en' : 'ko';
+    els.langSelect.addEventListener('change', (e) => {
+      state.lang = e.target.value;
       applyTranslations();
     });
+
+    window.addEventListener('keydown', (e) => {
+      const activeTag = document.activeElement?.tagName;
+      if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+      if (e.key === 'Escape') { hideContextMenu(); return; }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedNoteIds.length > 0) {
+        e.preventDefault();
+        deleteSelectedNotes();
+      }
+    });
+
+    window.addEventListener('pointerdown', (e) => {
+      if (!state.contextMenu.visible) return;
+      if (e.target.closest('#note-context-menu')) return;
+      hideContextMenu();
+    });
+    window.addEventListener('scroll', hideContextMenu, true);
 
     els.btnRecord.addEventListener('click', async () => {
       const tLang = translations[state.lang];
@@ -864,10 +1221,4 @@ button:hover{ filter:brightness(.95) }</style></head>
     init();
   </script>
 </body>
-</html><script>function showAlert(){
-  const box = document.createElement('div');
-  box.textContent = '버튼이 클릭되었습니다! ' + new Date().toLocaleTimeString();
-  box.style.cssText = 'margin-top:20px;padding:12px;border:1px solid #93c5fd;background:#dbeafe;border-radius:10px;color:#1e40af';
-  document.body.appendChild(box);
-}
-console.log('콘솔 테스트: 정상 동작');</script></body></html>
+</html>
