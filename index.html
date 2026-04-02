@@ -467,6 +467,7 @@
 
     // --- DOM Elements ---
     const els = {
+      mainStage: document.getElementById('main-stage'),
       canvasContainer: document.getElementById('canvas-scroll-container'),
       sidebar: document.getElementById('sidebar-pitches'),
       gridArea: document.getElementById('grid-area'),
@@ -647,8 +648,9 @@
       const minCell = manyRows ? (isMobile ? 14 : isTablet ? 16 : 18) : (isMobile ? 26 : isTablet ? 34 : 42);
       const maxCell = manyRows ? (isMobile ? 24 : isTablet ? 30 : 36) : (isMobile ? 42 : isTablet ? 56 : 88);
       const containerRect = els.canvasContainer.getBoundingClientRect();
+      const stageRect = els.mainStage.getBoundingClientRect();
       const availableWidth = containerRect.width - (isMobile ? 54 : 82);
-      const availableHeight = containerRect.height - (isMobile ? 12 : 16);
+      const availableHeight = Math.max(120, (stageRect.height || containerRect.height) - (isMobile ? 12 : 16));
       const targetSteps = Math.min(state.totalSteps, 32);
       const targetRows = PITCHES.length || 8;
       const fittedCell = Math.floor(availableWidth / targetSteps);
